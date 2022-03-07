@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>training.models &mdash; Neuroplytorch 1.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Neuroplytorch
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Welcome to Neuroplytorch’s documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../how_to.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/index.html">API documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Neuroplytorch</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>training.models</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for training.models</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">log</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">import</span> <span class="nn">torch</span> 
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span> 
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span> 
+
+<span class="kn">import</span> <span class="nn">pytorch_lightning</span> <span class="k">as</span> <span class="nn">pl</span> 
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">confusion_matrix</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span> 
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span> 
+<span class="kn">import</span> <span class="nn">random</span> 
+<span class="kn">import</span> <span class="nn">os</span> 
+
+<span class="kn">from</span> <span class="nn">training</span> <span class="kn">import</span> <span class="n">losses</span> 
+<span class="kn">from</span> <span class="nn">training</span> <span class="kn">import</span> <span class="n">basic_models</span>
+<span class="kn">from</span> <span class="nn">data</span> <span class="kn">import</span> <span class="n">data</span>
+
+<div class="viewcode-block" id="ReasoningModel"><a class="viewcode-back" href="../../api/models.html#training.models.ReasoningModel">[docs]</a><span class="k">class</span> <span class="nc">ReasoningModel</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Pytorch Lightning Module to train the reasoning layer of the Neuroplytorch model. Uses an LSTM neural network for a differentiable reasoning layer.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="ReasoningModel.__init__"><a class="viewcode-back" href="../../api/models.html#training.models.ReasoningModel.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">output_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">64</span><span class="p">,</span> <span class="n">use_relu</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> 
+                <span class="n">annealing_step</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">loss_str</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;MSELoss&#39;</span><span class="p">,</span> <span class="n">lr</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.001</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">        </span>
+<span class="sd">        :param input_size: Size of the input data (each element of the sequence).</span>
+<span class="sd">        :type input_size: int</span>
+<span class="sd">        :param output_size: Size of the output, for the case of Neuroplex this would be the number of complex events, resulting in an output vector of size output_size.</span>
+<span class="sd">        :type output_size: int</span>
+<span class="sd">        :param hidden_size: LSTM hidden layer size. Defaults to 64.</span>
+<span class="sd">        :type hidden_size: int, optional</span>
+<span class="sd">        :param use_relu: Use ReLU on output or not. This is for use with Evidential Deep Learning loss functions. Defaults to False. </span>
+<span class="sd">        :type use_relu: bool, optional</span>
+<span class="sd">        :param annealing_step: Annealing step parameter for Evidential Deep Learning loss functions. Defaults to 1.</span>
+<span class="sd">        :type annealing_step: int, optional</span>
+<span class="sd">        :param loss_str: Loss function name to use for training. Defaults to &#39;MSELoss&#39;.</span>
+<span class="sd">        :type loss_str: str, optional</span>
+<span class="sd">        :param lr: Learning rate for optimizer. Defaults to 0.001.</span>
+<span class="sd">        :type lr: float, optional</span>
+<span class="sd">        :param name: Separates the checkpoint weights, so experiment name goes here. Defalts to &#39;&#39;.</span>
+<span class="sd">        :type name: str, optional</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_size</span> <span class="o">=</span> <span class="n">input_size</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_size</span> <span class="o">=</span> <span class="n">output_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span> <span class="o">=</span> <span class="n">hidden_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_relu</span> <span class="o">=</span> <span class="n">use_relu</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">annealing_step</span> <span class="o">=</span> <span class="n">annealing_step</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loss_str</span> <span class="o">=</span> <span class="n">loss_str</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">lr</span> <span class="o">=</span> <span class="n">lr</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_device</span> <span class="o">=</span> <span class="n">losses</span><span class="o">.</span><span class="n">fetch_default_device</span><span class="p">()</span> 
+
+        <span class="c1"># save hyperparams for logging (Tensorboard)</span>
+        <span class="c1">#self.save_hyperparameters()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">basic_models</span><span class="o">.</span><span class="n">BasicLSTM</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">use_relu</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">use_relu</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">loss_fct</span> <span class="o">=</span> <span class="n">losses</span><span class="o">.</span><span class="n">get_loss_fct</span><span class="p">(</span><span class="n">loss_str</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ReasoningModel.forward"><a class="viewcode-back" href="../../api/models.html#training.models.ReasoningModel.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Model forward pass</span>
+
+<span class="sd">        :param x: Model input</span>
+<span class="sd">        :type x: torch.tensor</span>
+
+<span class="sd">        :return: Model output</span>
+<span class="sd">        :rtype: torch.tensor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> </div>
+
+<div class="viewcode-block" id="ReasoningModel.calculate_loss"><a class="viewcode-back" href="../../api/models.html#training.models.ReasoningModel.calculate_loss">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yPred</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">yTrue</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Calculate loss of forward pass using loss function provided on model initialisation</span>
+
+<span class="sd">        :param yPred: Output of model </span>
+<span class="sd">        :type yPred: torch.tensor</span>
+<span class="sd">        :param yTrue: Ground truth label</span>
+<span class="sd">        :type yTrue: torch.tensor</span>
+
+<span class="sd">        :return: Loss of yPred with yTrue as ground truth</span>
+<span class="sd">        :type: torch.tensor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_str</span><span class="o">==</span><span class="s1">&#39;MSELoss&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">mse_loss</span><span class="p">(</span><span class="n">yPred</span><span class="p">,</span> <span class="n">yTrue</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_str</span><span class="o">==</span><span class="s1">&#39;CrossEntropyLoss&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">cross_entropy</span><span class="p">(</span><span class="n">yPred</span><span class="p">,</span> <span class="n">yTrue</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_str</span> <span class="ow">in</span> <span class="n">losses</span><span class="o">.</span><span class="n">get_edl_losses</span><span class="p">():</span> <span class="k">return</span> <span class="n">losses</span><span class="o">.</span><span class="n">edl_log_loss</span><span class="p">(</span><span class="n">yPred</span><span class="p">,</span> <span class="n">yTrue</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_epoch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">annealing_step</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ReasoningModel.calculate_accuracy"><a class="viewcode-back" href="../../api/models.html#training.models.ReasoningModel.calculate_accuracy">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_accuracy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yPred</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">yTrue</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">:</span>
+        <span class="c1"># accuracy calculated as output vector has to exactly match label vector (e.g. [0,1,0,0]==[0,1,0,0] is correct (1.0), [0,0,0,0]==[0,1,0,0] is incorrect (0.0), rather than 0.75)</span>
+        <span class="sd">&quot;&quot;&quot; Calculate accuracy of forward pass. Reasoning model accuracy for a single instance is either 1.0 or 0.0, and must have both vectors match perfectly to be correct, otherwise is 0.0, regardless of whether some elements of each vector match.</span>
+
+<span class="sd">        :param yPred: Output of model </span>
+<span class="sd">        :type yPred: torch.tensor</span>
+<span class="sd">        :param yTrue: Ground truth label</span>
+<span class="sd">        :type yTrue: torch.tensor</span>
+
+<span class="sd">        :return: Mean accuracy of yPred with yTrue as ground truth</span>
+<span class="sd">        :type: torch.tensor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">yPred</span><span class="p">)</span><span class="o">==</span><span class="n">yTrue</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="ReasoningModel.configure_optimizers"><a class="viewcode-back" href="../../api/models.html#training.models.ReasoningModel.configure_optimizers">[docs]</a>    <span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># TODO: allow optimizer to be hyperparameter</span>
+        <span class="sd">&quot;&quot;&quot; Configure the optimizer (Adam) for training using a learning rate provided on model initialisation</span>
+
+<span class="sd">        :return: Optimizer set to model parameters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO: maybe make optimizer a hyperparam? </span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lr</span><span class="p">)</span> </div>
+        
+<div class="viewcode-block" id="ReasoningModel.evaluate"><a class="viewcode-back" href="../../api/models.html#training.models.ReasoningModel.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Forward pass a batch (used for train, val and test batches). Each step/epoch is logged with metrics loss and accuracy using Tensorboard.</span>
+
+<span class="sd">        :param batch: Input data as batch</span>
+<span class="sd">        :type batch: torch.tensor</span>
+<span class="sd">        :param batch_idx: Unused but needed in overloading</span>
+<span class="sd">        :type batch_idx: int</span>
+<span class="sd">        :param stage: Name of the current stage i.e. train, val or test. Defaults to None.</span>
+<span class="sd">        :type stage: str, optional</span>
+
+<span class="sd">        :return: Loss and accuracy as keys</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="n">x</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">batch</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span> 
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default_device</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="n">label</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default_device</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+
+        <span class="n">y_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> 
+        <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_loss</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+        <span class="n">acc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_accuracy</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+
+        <span class="c1"># log the accuracy and loss for this stage, on each step and on each epoch, update the progress bar</span>
+        <span class="k">if</span> <span class="n">stage</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s2">_loss&quot;</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">on_step</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">on_epoch</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">prog_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s1">_accuracy&#39;</span><span class="p">,</span> <span class="n">acc</span><span class="p">,</span> <span class="n">on_step</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">on_epoch</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">prog_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;loss&#39;</span><span class="p">:</span> <span class="n">loss</span><span class="p">,</span> <span class="s1">&#39;accuracy&#39;</span><span class="p">:</span> <span class="n">acc</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="ReasoningModel.training_step"><a class="viewcode-back" href="../../api/models.html#training.models.ReasoningModel.training_step">[docs]</a>    <span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; On training step, call self.evaluate (forward pass) and return</span>
+
+<span class="sd">        :param batch: Input data as batch</span>
+<span class="sd">        :type batch: torch.tensor</span>
+<span class="sd">        :param batch_idx: Unused but needed in overloading</span>
+<span class="sd">        :type batch_idx: int</span>
+<span class="sd">        </span>
+<span class="sd">        :return: Output from self.evaluate</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="s1">&#39;train&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ReasoningModel.validation_step"><a class="viewcode-back" href="../../api/models.html#training.models.ReasoningModel.validation_step">[docs]</a>    <span class="k">def</span> <span class="nf">validation_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; On validation step, call self.evaluate (forward pass) and return</span>
+
+<span class="sd">        :param batch: Input data as batch</span>
+<span class="sd">        :type batch: torch.tensor</span>
+<span class="sd">        :param batch_idx: Unused but needed in overloading</span>
+<span class="sd">        :type batch_idx: int</span>
+<span class="sd">        </span>
+<span class="sd">        :return: Output from self.evaluate</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ReasoningModel.test_step"><a class="viewcode-back" href="../../api/models.html#training.models.ReasoningModel.test_step">[docs]</a>    <span class="k">def</span> <span class="nf">test_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; On test step, call self.evaluate (forward pass) and return</span>
+
+<span class="sd">        :param batch: Input data as batch</span>
+<span class="sd">        :type batch: torch.tensor</span>
+<span class="sd">        :param batch_idx: Unused but needed in overloading</span>
+<span class="sd">        :type batch_idx: int</span>
+<span class="sd">        </span>
+<span class="sd">        :return: Output from self.evaluate</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="s1">&#39;test&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ReasoningModel.save_weights"><a class="viewcode-back" href="../../api/models.html#training.models.ReasoningModel.save_weights">[docs]</a>    <span class="k">def</span> <span class="nf">save_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Save the model weights only using pure Pytorch implementation of saving weights.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="bp">cls</span><span class="p">)</span></div>
+
+    <span class="c1"># TODO: perhaps save the best only? </span>
+    <span class="c1"># save the weights at each epoch end </span>
+<div class="viewcode-block" id="ReasoningModel.on_train_epoch_end"><a class="viewcode-back" href="../../api/models.html#training.models.ReasoningModel.on_train_epoch_end">[docs]</a>    <span class="k">def</span> <span class="nf">on_train_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_weights</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;curr_tmp_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">_reasoning_model.pt&#39;</span><span class="p">)</span></div></div>
+        
+<div class="viewcode-block" id="PerceptionWindow"><a class="viewcode-back" href="../../api/models.html#training.models.PerceptionWindow">[docs]</a><span class="k">class</span> <span class="nc">PerceptionWindow</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Pytorch Lightning Module wrapping the LeNet pure Pytorch model for training with the EndToEndDataModule or EndToEndNoTestDataModule using Pytorch Lightning. Uses the intermediate label</span>
+<span class="sd">    from the dataset to train the model on windowed data, similar to how the pereception layer is trained in the Neuroplytorch model but excluding the reasoning layer.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="PerceptionWindow.__init__"><a class="viewcode-back" href="../../api/models.html#training.models.PerceptionWindow.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">perception_model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">window_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_primitive_events</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">loss_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">lr</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param perception_model: The perception model to use on the windowed data</span>
+<span class="sd">        :type perception_mode: torch.nn.Module</span>
+<span class="sd">        :param window_size: Size of the window of primitive events. </span>
+<span class="sd">        :type window_size: int</span>
+<span class="sd">        :param num_primitive_events: Number of primitive events i.e. size of one hot primitive event vectors. </span>
+<span class="sd">        :type num_primitive_events: int</span>
+<span class="sd">        :param loss_str: Loss function name to use for training.</span>
+<span class="sd">        :type loss_str: str</span>
+<span class="sd">        :param lr: Learning rate for optimizer. </span>
+<span class="sd">        :type lr: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">perception_model</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">loss_str</span> <span class="o">=</span> <span class="n">loss_str</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">lr</span> <span class="o">=</span> <span class="n">lr</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_device</span> <span class="o">=</span> <span class="n">losses</span><span class="o">.</span><span class="n">fetch_default_device</span><span class="p">()</span> 
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span> <span class="o">=</span> <span class="n">window_size</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_primitive_events</span> <span class="o">=</span> <span class="n">num_primitive_events</span>
+
+        <span class="c1">#self.save_hyperparameters()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">loss_fct</span> <span class="o">=</span> <span class="n">losses</span><span class="o">.</span><span class="n">get_loss_fct</span><span class="p">(</span><span class="n">loss_str</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PerceptionWindow.forward"><a class="viewcode-back" href="../../api/models.html#training.models.PerceptionWindow.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Model forward pass. Takes the windowed input data from x, and for each instance in window, the model is inferenced. The batch and window axis are swapped so each model forward pass is over the batch of element *i* in the window. </span>
+
+<span class="sd">        :param x: Model input</span>
+<span class="sd">        :type x: torch.tensor</span>
+
+<span class="sd">        :return: Model output</span>
+<span class="sd">        :rtype: torch.tensor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">outs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">xx</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span> <span class="n">outs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">xx</span><span class="p">))</span>
+        <span class="n">outs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">outs</span><span class="p">)</span>
+        <span class="n">outs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">outs</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">outs</span> </div>
+        
+
+<div class="viewcode-block" id="PerceptionWindow.calculate_loss"><a class="viewcode-back" href="../../api/models.html#training.models.PerceptionWindow.calculate_loss">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yPred</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">yTrue</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Calculate loss of model output with respect to ground truth and loss function provided on model initialisation</span>
+
+<span class="sd">        :param yPred: Output of model </span>
+<span class="sd">        :type yPred: torch.tensor</span>
+<span class="sd">        :param yTrue: Ground truth label</span>
+<span class="sd">        :type yTrue: torch.tensor</span>
+
+<span class="sd">        :return: Loss of yPred with yTrue as ground truth</span>
+<span class="sd">        :type: torch.tensor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_str</span><span class="o">==</span><span class="s1">&#39;MSELoss&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">mse_loss</span><span class="p">(</span><span class="n">yPred</span><span class="p">,</span> <span class="n">yTrue</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_str</span><span class="o">==</span><span class="s1">&#39;CrossEntropyLoss&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">cross_entropy</span><span class="p">(</span><span class="n">yPred</span><span class="p">,</span> <span class="n">yTrue</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_str</span> <span class="ow">in</span> <span class="n">losses</span><span class="o">.</span><span class="n">get_edl_losses</span><span class="p">():</span> <span class="k">return</span> <span class="n">losses</span><span class="o">.</span><span class="n">edl_log_loss</span><span class="p">(</span><span class="n">yPred</span><span class="p">,</span> <span class="n">yTrue</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_epoch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">annealing_step</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PerceptionWindow.calculate_accuracy"><a class="viewcode-back" href="../../api/models.html#training.models.PerceptionWindow.calculate_accuracy">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_accuracy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yPred</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">yTrue</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Calculate accuracy of forward pass. </span>
+
+<span class="sd">        :param yPred: Output of model </span>
+<span class="sd">        :type yPred: torch.tensor</span>
+<span class="sd">        :param yTrue: Ground truth label</span>
+<span class="sd">        :type yTrue: torch.tensor</span>
+
+<span class="sd">        :return: Mean accuracy of yPred with yTrue as ground truth</span>
+<span class="sd">        :type: torch.tensor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">yPred</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">==</span><span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">yTrue</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">float</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="PerceptionWindow.configure_optimizers"><a class="viewcode-back" href="../../api/models.html#training.models.PerceptionWindow.configure_optimizers">[docs]</a>    <span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Configure the optimizer (Adam) for training using a learning rate provided on model initialisation</span>
+
+<span class="sd">        :return: Optimizer set to model parameters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lr</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="PerceptionWindow.evaluate"><a class="viewcode-back" href="../../api/models.html#training.models.PerceptionWindow.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Forward pass a batch (used for train, val and test batches). Each step/epoch is logged with metrics loss and accuracy using Tensorboard.</span>
+
+<span class="sd">        :param batch: Input data as batch</span>
+<span class="sd">        :type batch: torch.tensor</span>
+<span class="sd">        :param batch_idx: Unused but needed in overloading</span>
+<span class="sd">        :type batch_idx: int</span>
+<span class="sd">        :param stage: Name of the current stage i.e. train, val or test. Defaults to None.</span>
+<span class="sd">        :type stage: str, optional</span>
+
+<span class="sd">        :return: Loss and accuracy as keys</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">batch</span><span class="p">[</span><span class="s1">&#39;label_intermediate&#39;</span><span class="p">]</span> 
+
+        <span class="n">y_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> 
+        <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_loss</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+        <span class="n">acc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_accuracy</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">stage</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s2">_loss&quot;</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">on_step</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">on_epoch</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">prog_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s1">_accuracy&#39;</span><span class="p">,</span> <span class="n">acc</span><span class="p">,</span> <span class="n">on_step</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">on_epoch</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">prog_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;loss&#39;</span><span class="p">:</span> <span class="n">loss</span><span class="p">,</span> <span class="s1">&#39;accuracy&#39;</span><span class="p">:</span> <span class="n">acc</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="PerceptionWindow.training_step"><a class="viewcode-back" href="../../api/models.html#training.models.PerceptionWindow.training_step">[docs]</a>    <span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; On training step, call self.evaluate (forward pass) and return</span>
+
+<span class="sd">        :param batch: Input data as batch</span>
+<span class="sd">        :type batch: torch.tensor</span>
+<span class="sd">        :param batch_idx: Unused but needed in overloading</span>
+<span class="sd">        :type batch_idx: int</span>
+<span class="sd">        </span>
+<span class="sd">        :return: Output from self.evaluate</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="s1">&#39;train&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PerceptionWindow.validation_step"><a class="viewcode-back" href="../../api/models.html#training.models.PerceptionWindow.validation_step">[docs]</a>    <span class="k">def</span> <span class="nf">validation_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; On validation step, call self.evaluate (forward pass) and return</span>
+
+<span class="sd">        :param batch: Input data as batch</span>
+<span class="sd">        :type batch: torch.tensor</span>
+<span class="sd">        :param batch_idx: Unused but needed in overloading</span>
+<span class="sd">        :type batch_idx: int</span>
+<span class="sd">        </span>
+<span class="sd">        :return: Output from self.evaluate</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PerceptionWindow.test_step"><a class="viewcode-back" href="../../api/models.html#training.models.PerceptionWindow.test_step">[docs]</a>    <span class="k">def</span> <span class="nf">test_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; On test step, call self.evaluate (forward pass) and return</span>
+
+<span class="sd">        :param batch: Input data as batch</span>
+<span class="sd">        :type batch: torch.tensor</span>
+<span class="sd">        :param batch_idx: Unused but needed in overloading</span>
+<span class="sd">        :type batch_idx: int</span>
+<span class="sd">        </span>
+<span class="sd">        :return: Output from self.evaluate</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="s1">&#39;test&#39;</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="Neuroplytorch"><a class="viewcode-back" href="../../api/models.html#training.models.Neuroplytorch">[docs]</a><span class="k">class</span> <span class="nc">Neuroplytorch</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Neuroplytorch model for end-to-end training. Takes the trained reasoning model of type class:`training.basic_models.BasicLSTM` and a perception model that inherits from torch.nn.Module to create the end-to-end model for inferencing from raw input data to complex event labels.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Neuroplytorch.__init__"><a class="viewcode-back" href="../../api/models.html#training.models.Neuroplytorch.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reasoning_model</span><span class="p">:</span> <span class="n">basic_models</span><span class="o">.</span><span class="n">BasicLSTM</span><span class="p">,</span> <span class="n">perception_model</span><span class="p">:</span> <span class="n">PerceptionWindow</span><span class="p">,</span> <span class="n">window_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_primitive_events</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">loss_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">lr</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; </span>
+
+<span class="sd">        :param reasoning_model:</span>
+<span class="sd">        :type reasoning_model: class:`training.basic_models.BasicLSTM`</span>
+<span class="sd">        :param perception_model: The perception model to use on the windowed data</span>
+<span class="sd">        :type perception_mode: class:`training.models.PerceptionWindow`</span>
+<span class="sd">        :param window_size: Size of the window of primitive events. </span>
+<span class="sd">        :type window_size: int</span>
+<span class="sd">        :param num_primitive_events: Number of primitive events i.e. size of one hot primitive event vectors.</span>
+<span class="sd">        :type num_primitive_events: int</span>
+<span class="sd">        :param loss_str: Loss function name to use for training. </span>
+<span class="sd">        :type loss_str: str</span>
+<span class="sd">        :param lr: Learning rate for optimizer. </span>
+<span class="sd">        :type lr: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span> 
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">perception_model</span> <span class="o">=</span> <span class="n">perception_model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reasoning_model</span> <span class="o">=</span> <span class="n">reasoning_model</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">loss_str</span> <span class="o">=</span> <span class="n">loss_str</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_device</span> <span class="o">=</span> <span class="n">losses</span><span class="o">.</span><span class="n">fetch_default_device</span><span class="p">()</span> 
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span> <span class="o">=</span> <span class="n">window_size</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_primitive_events</span> <span class="o">=</span> <span class="n">num_primitive_events</span>
+
+        <span class="c1">#self.save_hyperparameters()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">loss_fct</span> <span class="o">=</span> <span class="n">losses</span><span class="o">.</span><span class="n">get_loss_fct</span><span class="p">(</span><span class="n">loss_str</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">lr</span> <span class="o">=</span> <span class="n">lr</span> 
+
+        <span class="c1"># Ensure frozen reasoning layer and unfrozen perception layer </span>
+        <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reasoning_model</span><span class="o">.</span><span class="n">parameters</span><span class="p">():</span> <span class="n">param</span><span class="o">.</span><span class="n">requires_grad</span> <span class="o">=</span> <span class="kc">False</span> 
+        <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">perception_model</span><span class="o">.</span><span class="n">parameters</span><span class="p">():</span> <span class="n">param</span><span class="o">.</span><span class="n">requires_grad</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># Used for keeping track of epoch-level complex accuracies and epoch-level predictions for confusion matrix</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">epoch_complex_accuracies</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;train&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;val&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;test&#39;</span><span class="p">:</span> <span class="p">[]}</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">epoch_ypreds</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;train&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;val&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;test&#39;</span><span class="p">:</span> <span class="p">[]}</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">epoch_ytrues</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;train&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;val&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;test&#39;</span><span class="p">:</span> <span class="p">[]}</span> </div>
+
+<div class="viewcode-block" id="Neuroplytorch.forward"><a class="viewcode-back" href="../../api/models.html#training.models.Neuroplytorch.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Model forward pass. First passes through the perception layer. which outputs a window of inferences, which is then passed through the reasoning layer to inference the complex event label.</span>
+
+<span class="sd">        :param x: Model input</span>
+<span class="sd">        :type x: torch.tensor</span>
+
+<span class="sd">        :return: Tuple of intermediate_output, reasoning_output</span>
+<span class="sd">        :rtype: tuple</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">intermediate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">perception_model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> 
+        <span class="n">reasoning_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reasoning_model</span><span class="p">(</span><span class="n">intermediate</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">intermediate</span><span class="p">,</span> <span class="n">reasoning_out</span></div>
+        
+<div class="viewcode-block" id="Neuroplytorch.calculate_loss"><a class="viewcode-back" href="../../api/models.html#training.models.Neuroplytorch.calculate_loss">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yPred</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">yTrue</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Calculate loss of model output with respect to ground truth and loss function provided on model initialisation</span>
+
+<span class="sd">        :param yPred: Output of model </span>
+<span class="sd">        :type yPred: torch.tensor</span>
+<span class="sd">        :param yTrue: Ground truth label</span>
+<span class="sd">        :type yTrue: torch.tensor</span>
+
+<span class="sd">        :return: Loss of yPred with yTrue as ground truth</span>
+<span class="sd">        :type: torch.tensor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_str</span><span class="o">==</span><span class="s1">&#39;MSELoss&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">mse_loss</span><span class="p">(</span><span class="n">yPred</span><span class="p">,</span> <span class="n">yTrue</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_str</span><span class="o">==</span><span class="s1">&#39;CrossEntropyLoss&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">cross_entropy</span><span class="p">(</span><span class="n">yPred</span><span class="p">,</span> <span class="n">yTrue</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_str</span> <span class="ow">in</span> <span class="n">losses</span><span class="o">.</span><span class="n">get_edl_losses</span><span class="p">():</span> <span class="k">return</span> <span class="n">losses</span><span class="o">.</span><span class="n">edl_log_loss</span><span class="p">(</span><span class="n">yPred</span><span class="p">,</span> <span class="n">yTrue</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_epoch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">annealing_step</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="Neuroplytorch.calculate_accuracy"><a class="viewcode-back" href="../../api/models.html#training.models.Neuroplytorch.calculate_accuracy">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_accuracy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yPred</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">yTrue</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Calculate accuracy of forward pass. Neuroplytorch model accuracy for a single instance is either 1.0 or 0.0, and must have both vectors match perfectly to be correct, otherwise is 0.0, regardless of whether some elements of each vector match.</span>
+
+<span class="sd">        :param yPred: Output of model </span>
+<span class="sd">        :type yPred: torch.tensor</span>
+<span class="sd">        :param yTrue: Ground truth label</span>
+<span class="sd">        :type yTrue: torch.tensor</span>
+
+<span class="sd">        :return: Mean accuracy of yPred with yTrue as ground truth</span>
+<span class="sd">        :type: torch.tensor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">yPred</span><span class="p">)</span><span class="o">==</span><span class="n">yTrue</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="Neuroplytorch.calculate_complex_accuracy"><a class="viewcode-back" href="../../api/models.html#training.models.Neuroplytorch.calculate_complex_accuracy">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_complex_accuracy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yPred</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">yTrue</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Calculate accuracy of forward pass, but only considering instances where either the inference or ground truth are not &#39;zero-complex-event windows&#39;, i.e. the accuracy of instances where the prediction or ground truth has at least one complex event. This gives a better representation of model accuracy given the usual very large bias towards windows with no complex events occuring.</span>
+
+<span class="sd">        :param yPred: Output of model </span>
+<span class="sd">        :type yPred: torch.tensor</span>
+<span class="sd">        :param yTrue: Ground truth label</span>
+<span class="sd">        :type yTrue: torch.tensor</span>
+
+<span class="sd">        :return: Mean accuracy of yPred with yTrue as ground truth</span>
+<span class="sd">        :type: torch.tensor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">yPred</span><span class="p">)</span><span class="o">==</span><span class="n">yTrue</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">yTrue</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">bool</span><span class="p">()</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">yPred</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">bool</span><span class="p">()</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">a</span><span class="p">[</span><span class="n">d</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Neuroplytorch.calculate_intermediate_accuracy"><a class="viewcode-back" href="../../api/models.html#training.models.Neuroplytorch.calculate_intermediate_accuracy">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_intermediate_accuracy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yPredIntermediate</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">yTrueIntermediate</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Calculate accuracy of the intermediate output in forward pass, i.e. the accuracy of the perception layer relative to the intermediate labels. Output of model and labels are windowed.</span>
+
+<span class="sd">        :param yPredIntermediate: Output of model </span>
+<span class="sd">        :type yPredIntermediate: torch.tensor</span>
+<span class="sd">        :param yTrueIntermediate: Ground truth label</span>
+<span class="sd">        :type yTrueIntermediate: torch.tensor</span>
+
+<span class="sd">        :return: Mean accuracy of yPredIntermediate with yTrueIntermediate as ground truth</span>
+<span class="sd">        :type: torch.tensor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">yPredIntermediate</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">==</span><span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">yTrueIntermediate</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">float</span><span class="p">()</span> 
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">a</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Neuroplytorch.configure_optimizers"><a class="viewcode-back" href="../../api/models.html#training.models.Neuroplytorch.configure_optimizers">[docs]</a>    <span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Configure the optimizer (Adam) for training using a learning rate provided on model initialisation</span>
+
+<span class="sd">        :return: Optimizer set to model parameters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">perception_model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lr</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="Neuroplytorch.evaluate"><a class="viewcode-back" href="../../api/models.html#training.models.Neuroplytorch.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Forward pass a batch (used for train, val and test batches). Each step/epoch is logged with metrics loss, accuracy and inter_accuracy using Tensorboard.</span>
+
+<span class="sd">        :param batch: Input data as batch</span>
+<span class="sd">        :type batch: torch.tensor</span>
+<span class="sd">        :param batch_idx: Unused but needed in overloading</span>
+<span class="sd">        :type batch_idx: int</span>
+<span class="sd">        :param stage: Name of the current stage i.e. train, val or test. Defaults to None.</span>
+<span class="sd">        :type stage: str, optional</span>
+
+<span class="sd">        :return: Loss and accuracy as keys</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">label_intermediate</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">batch</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">],</span> <span class="n">batch</span><span class="p">[</span><span class="s1">&#39;label_intermediate&#39;</span><span class="p">]</span>
+
+        <span class="n">intermediate_out</span><span class="p">,</span> <span class="n">reasoning_out</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> 
+        <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_loss</span><span class="p">(</span><span class="n">reasoning_out</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+        <span class="n">acc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_accuracy</span><span class="p">(</span><span class="n">reasoning_out</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">epoch_complex_accuracies</span><span class="p">[</span><span class="n">stage</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calculate_complex_accuracy</span><span class="p">(</span><span class="n">reasoning_out</span><span class="p">,</span> <span class="n">label</span><span class="p">))</span>
+        <span class="n">intermediate_acc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_intermediate_accuracy</span><span class="p">(</span><span class="n">intermediate_out</span><span class="p">,</span> <span class="n">label_intermediate</span><span class="p">)</span>
+
+        <span class="c1"># CONFUSION MATRIX CODE </span>
+        <span class="n">yPred</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">reasoning_out</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+        <span class="n">yPred_add</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">reasoning_out</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">bool</span><span class="p">()</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+        <span class="n">yPred</span> <span class="o">+=</span> <span class="n">yPred_add</span> 
+
+        <span class="n">yTrue</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+        <span class="n">yTrue_add</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">bool</span><span class="p">()</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+        <span class="n">yTrue</span> <span class="o">+=</span> <span class="n">yTrue_add</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">epoch_ypreds</span><span class="p">[</span><span class="n">stage</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yPred</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">epoch_ytrues</span><span class="p">[</span><span class="n">stage</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yTrue</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">stage</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s2">_loss&quot;</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">on_step</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">on_epoch</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">prog_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s1">_accuracy&#39;</span><span class="p">,</span> <span class="n">acc</span><span class="p">,</span> <span class="n">on_step</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">on_epoch</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">prog_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s2">_inter_accuracy&quot;</span><span class="p">,</span> <span class="n">intermediate_acc</span><span class="p">,</span> <span class="n">on_step</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">on_epoch</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">prog_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;loss&#39;</span><span class="p">:</span> <span class="n">loss</span><span class="p">,</span> <span class="s1">&#39;accuracy&#39;</span><span class="p">:</span> <span class="n">acc</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="Neuroplytorch.training_step"><a class="viewcode-back" href="../../api/models.html#training.models.Neuroplytorch.training_step">[docs]</a>    <span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; On training step, call self.evaluate (forward pass) and return</span>
+
+<span class="sd">        :param batch: Input data as batch</span>
+<span class="sd">        :type batch: torch.tensor</span>
+<span class="sd">        :param batch_idx: Unused but needed in overloading</span>
+<span class="sd">        :type batch_idx: int</span>
+<span class="sd">        </span>
+<span class="sd">        :return: Output from self.evaluate</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="s1">&#39;train&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Neuroplytorch.validation_step"><a class="viewcode-back" href="../../api/models.html#training.models.Neuroplytorch.validation_step">[docs]</a>    <span class="k">def</span> <span class="nf">validation_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; On validation step, call self.evaluate (forward pass) and return</span>
+
+<span class="sd">        :param batch: Input data as batch</span>
+<span class="sd">        :type batch: torch.tensor</span>
+<span class="sd">        :param batch_idx: Unused but needed in overloading</span>
+<span class="sd">        :type batch_idx: int</span>
+<span class="sd">        </span>
+<span class="sd">        :return: Output from self.evaluate</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Neuroplytorch.test_step"><a class="viewcode-back" href="../../api/models.html#training.models.Neuroplytorch.test_step">[docs]</a>    <span class="k">def</span> <span class="nf">test_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; On test step, call self.evaluate (forward pass) and return</span>
+
+<span class="sd">        :param batch: Input data as batch</span>
+<span class="sd">        :type batch: torch.tensor</span>
+<span class="sd">        :param batch_idx: Unused but needed in overloading</span>
+<span class="sd">        :type batch_idx: int</span>
+<span class="sd">        </span>
+<span class="sd">        :return: Output from self.evaluate</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="s1">&#39;test&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Neuroplytorch.training_epoch_end"><a class="viewcode-back" href="../../api/models.html#training.models.Neuroplytorch.training_epoch_end">[docs]</a>    <span class="k">def</span> <span class="nf">training_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; On training epoch end, calculate and log the complex accuracy across the whole epoch. Since the bias towards windows with no complex events occuring is large, some batches may be entirely &#39;zero-window&#39; instances, and so the calculation has to occur at the end of the epoch rather than per-batch.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;train_complex_accuracy&#39;</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">epoch_complex_accuracies</span><span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">])),</span> <span class="n">on_epoch</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">prog_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">on_step</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Neuroplytorch.validation_epoch_end"><a class="viewcode-back" href="../../api/models.html#training.models.Neuroplytorch.validation_epoch_end">[docs]</a>    <span class="k">def</span> <span class="nf">validation_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; On validation epoch end, calculate and log the complex accuracy across the whole epoch. Also create a confusion matrix from the validation inferences across the epoch and log.</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;val_complex_accuracy&#39;</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">epoch_complex_accuracies</span><span class="p">[</span><span class="s1">&#39;val&#39;</span><span class="p">])),</span> <span class="n">on_epoch</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">prog_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">on_step</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        
+        <span class="n">ytrue</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">epoch_ytrues</span><span class="p">[</span><span class="s1">&#39;val&#39;</span><span class="p">])</span>
+        <span class="n">ypred</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">epoch_ypreds</span><span class="p">[</span><span class="s1">&#39;val&#39;</span><span class="p">])</span> 
+        <span class="nb">print</span><span class="p">(</span><span class="n">confusion_matrix</span><span class="p">(</span><span class="n">ytrue</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">ypred</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">epoch_ypreds</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;train&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;val&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;test&#39;</span><span class="p">:</span> <span class="p">[]}</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">epoch_ytrues</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;train&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;val&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;test&#39;</span><span class="p">:</span> <span class="p">[]}</span> </div>
+    
+<div class="viewcode-block" id="Neuroplytorch.test_epoch_end"><a class="viewcode-back" href="../../api/models.html#training.models.Neuroplytorch.test_epoch_end">[docs]</a>    <span class="k">def</span> <span class="nf">test_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; On training epoch end, calculate and log the complex accuracy across the whole epoch. </span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;test_complex_accuracy&#39;</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">epoch_complex_accuracies</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">])),</span> <span class="n">on_epoch</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">prog_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">on_step</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">save_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">dir</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="nb">dir</span><span class="p">):</span> <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="nb">dir</span><span class="p">)</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reasoning_model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="nb">dir</span><span class="o">+</span><span class="s2">&quot;/reasoning_model.pt&quot;</span><span class="p">)</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">perception_model</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="nb">dir</span><span class="o">+</span><span class="s2">&quot;/perception_model.pt&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">load_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">dir</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reasoning_model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">dir</span><span class="o">+</span><span class="s2">&quot;/reasoning_model.pt&quot;</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span class="p">))</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">perception_model</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">dir</span><span class="o">+</span><span class="s2">&quot;/perception_model.pt&quot;</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span class="p">))</span></div>
+    
+
+<span class="c1"># # CUSTOM MODULES FOR PRETRAINING PERCEPTION MODELS</span>
+<div class="viewcode-block" id="MNISTModel"><a class="viewcode-back" href="../../api/models.html#training.models.MNISTModel">[docs]</a><span class="k">class</span> <span class="nc">MNISTModel</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Pytorch Lightning Module wrapping the LeNet pure Pytorch model for training with the MNISTDataModule using Pytorch Lightning</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="MNISTModel.__init__"><a class="viewcode-back" href="../../api/models.html#training.models.MNISTModel.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loss_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">lr</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param loss_str: Loss function name to use for training.</span>
+<span class="sd">        :type loss_str: str</span>
+<span class="sd">        :param lr: Learning rate for optimizer. </span>
+<span class="sd">        :type lr: float </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">loss_str</span> <span class="o">=</span> <span class="n">loss_str</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">lr</span> <span class="o">=</span> <span class="n">lr</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_device</span> <span class="o">=</span> <span class="n">losses</span><span class="o">.</span><span class="n">fetch_default_device</span><span class="p">()</span> 
+
+        <span class="c1">#self.save_hyperparameters()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">basic_models</span><span class="o">.</span><span class="n">LeNet</span><span class="p">(</span><span class="n">output_size</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">loss_fct</span> <span class="o">=</span> <span class="n">losses</span><span class="o">.</span><span class="n">get_loss_fct</span><span class="p">(</span><span class="n">loss_str</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MNISTModel.forward"><a class="viewcode-back" href="../../api/models.html#training.models.MNISTModel.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Model forward pass</span>
+
+<span class="sd">        :param x: Model input</span>
+<span class="sd">        :type x: torch.tensor</span>
+
+<span class="sd">        :return: Model output</span>
+<span class="sd">        :rtype: torch.tensor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> </div>
+
+<div class="viewcode-block" id="MNISTModel.calculate_loss"><a class="viewcode-back" href="../../api/models.html#training.models.MNISTModel.calculate_loss">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yPred</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">yTrue</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Calculate loss of model output with respect to ground truth and loss function provided on model initialisation</span>
+
+<span class="sd">        :param yTrue: Ground truth label</span>
+<span class="sd">        :type yTrue: torch.tensor</span>
+<span class="sd">        :param yPred: Output of model </span>
+<span class="sd">        :type yPred: torch.tensor</span>
+
+<span class="sd">        :return: Loss of yPred with yTrue as ground truth</span>
+<span class="sd">        :type: torch.tensor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_str</span><span class="o">==</span><span class="s1">&#39;MSELoss&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">mse_loss</span><span class="p">(</span><span class="n">yPred</span><span class="p">,</span> <span class="n">yTrue</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_str</span><span class="o">==</span><span class="s1">&#39;CrossEntropyLoss&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">cross_entropy</span><span class="p">(</span><span class="n">yPred</span><span class="p">,</span> <span class="n">yTrue</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_str</span> <span class="ow">in</span> <span class="n">losses</span><span class="o">.</span><span class="n">get_edl_losses</span><span class="p">():</span> <span class="k">return</span> <span class="n">losses</span><span class="o">.</span><span class="n">edl_log_loss</span><span class="p">(</span><span class="n">yPred</span><span class="p">,</span> <span class="n">yTrue</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_epoch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">annealing_step</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MNISTModel.calculate_accuracy"><a class="viewcode-back" href="../../api/models.html#training.models.MNISTModel.calculate_accuracy">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_accuracy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yPred</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">yTrue</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Calculate accuracy of forward pass. </span>
+
+<span class="sd">        :param yPred: Output of model </span>
+<span class="sd">        :type yPred: torch.tensor</span>
+<span class="sd">        :param yTrue: Ground truth label</span>
+<span class="sd">        :type yTrue: torch.tensor</span>
+
+<span class="sd">        :return: Mean accuracy of yPred with yTrue as ground truth</span>
+<span class="sd">        :type: torch.tensor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">yPred</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">==</span><span class="n">yTrue</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="MNISTModel.configure_optimizers"><a class="viewcode-back" href="../../api/models.html#training.models.MNISTModel.configure_optimizers">[docs]</a>    <span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Configure the optimizer (Adam) for training using a learning rate provided on model initialisation</span>
+
+<span class="sd">        :return: Optimizer set to model parameters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lr</span><span class="p">)</span> </div>
+
+<div class="viewcode-block" id="MNISTModel.evaluate"><a class="viewcode-back" href="../../api/models.html#training.models.MNISTModel.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Forward pass a batch (used for train, val and test batches). Each step/epoch is logged with metrics loss and accuracy using Tensorboard.</span>
+
+<span class="sd">        :param batch: Input data as batch</span>
+<span class="sd">        :type batch: torch.tensor</span>
+<span class="sd">        :param batch_idx: Unused but needed in overloading</span>
+<span class="sd">        :type batch_idx: int</span>
+<span class="sd">        :param stage: Name of the current stage i.e. train, val or test. Defaults to None.</span>
+<span class="sd">        :type stage: str, optional</span>
+
+<span class="sd">        :return: Loss and accuracy as keys</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">batch</span>
+        <span class="n">y_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> 
+
+        <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_loss</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+        <span class="n">acc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_accuracy</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">stage</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s2">_loss&quot;</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">on_step</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">on_epoch</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">prog_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s1">_accuracy&#39;</span><span class="p">,</span> <span class="n">acc</span><span class="p">,</span> <span class="n">on_step</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">on_epoch</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">prog_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;loss&#39;</span><span class="p">:</span> <span class="n">loss</span><span class="p">,</span> <span class="s1">&#39;accuracy&#39;</span><span class="p">:</span> <span class="n">acc</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="MNISTModel.training_step"><a class="viewcode-back" href="../../api/models.html#training.models.MNISTModel.training_step">[docs]</a>    <span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; On training step, call self.evaluate (forward pass) and return</span>
+
+<span class="sd">        :param batch: Input data as batch</span>
+<span class="sd">        :type batch: torch.tensor</span>
+<span class="sd">        :param batch_idx: Unused but needed in overloading</span>
+<span class="sd">        :type batch_idx: int</span>
+<span class="sd">        </span>
+<span class="sd">        :return: Output from self.evaluate</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="s1">&#39;train&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MNISTModel.validation_step"><a class="viewcode-back" href="../../api/models.html#training.models.MNISTModel.validation_step">[docs]</a>    <span class="k">def</span> <span class="nf">validation_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; On validation step, call self.evaluate (forward pass) and return</span>
+
+<span class="sd">        :param batch: Input data as batch</span>
+<span class="sd">        :type batch: torch.tensor</span>
+<span class="sd">        :param batch_idx: Unused but needed in overloading</span>
+<span class="sd">        :type batch_idx: int</span>
+<span class="sd">        </span>
+<span class="sd">        :return: Output from self.evaluate</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MNISTModel.test_step"><a class="viewcode-back" href="../../api/models.html#training.models.MNISTModel.test_step">[docs]</a>    <span class="k">def</span> <span class="nf">test_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; On test step, call self.evaluate (forward pass) and return</span>
+
+<span class="sd">        :param batch: Input data as batch</span>
+<span class="sd">        :type batch: torch.tensor</span>
+<span class="sd">        :param batch_idx: Unused but needed in overloading</span>
+<span class="sd">        :type batch_idx: int</span>
+<span class="sd">        </span>
+<span class="sd">        :return: Output from self.evaluate</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="s1">&#39;test&#39;</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="EMNISTModel"><a class="viewcode-back" href="../../api/models.html#training.models.EMNISTModel">[docs]</a><span class="k">class</span> <span class="nc">EMNISTModel</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Pytorch Lightning Module wrapping the LeNet pure Pytorch model for training with the EMNISTDataModule using Pytorch Lightning</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="EMNISTModel.__init__"><a class="viewcode-back" href="../../api/models.html#training.models.EMNISTModel.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loss_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">lr</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param loss_str: Loss function name to use for training.</span>
+<span class="sd">        :type loss_str: str</span>
+<span class="sd">        :param lr: Learning rate for optimizer. </span>
+<span class="sd">        :type lr: float </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">loss_str</span> <span class="o">=</span> <span class="n">loss_str</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">lr</span> <span class="o">=</span> <span class="n">lr</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_device</span> <span class="o">=</span> <span class="n">losses</span><span class="o">.</span><span class="n">fetch_default_device</span><span class="p">()</span> 
+
+        <span class="c1">#self.save_hyperparameters()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">basic_models</span><span class="o">.</span><span class="n">LeNet</span><span class="p">(</span><span class="n">output_size</span><span class="o">=</span><span class="mi">26</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">loss_fct</span> <span class="o">=</span> <span class="n">losses</span><span class="o">.</span><span class="n">get_loss_fct</span><span class="p">(</span><span class="n">loss_str</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EMNISTModel.forward"><a class="viewcode-back" href="../../api/models.html#training.models.EMNISTModel.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Model forward pass</span>
+
+<span class="sd">        :param x: Model input</span>
+<span class="sd">        :type x: torch.tensor</span>
+
+<span class="sd">        :return: Model output</span>
+<span class="sd">        :rtype: torch.tensor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> </div>
+
+<div class="viewcode-block" id="EMNISTModel.calculate_loss"><a class="viewcode-back" href="../../api/models.html#training.models.EMNISTModel.calculate_loss">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yPred</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">yTrue</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Calculate loss of model output with respect to ground truth and loss function provided on model initialisation</span>
+
+<span class="sd">        :param yTrue: Ground truth label</span>
+<span class="sd">        :type yTrue: torch.tensor</span>
+<span class="sd">        :param yPred: Output of model </span>
+<span class="sd">        :type yPred: torch.tensor</span>
+
+<span class="sd">        :return: Loss of yPred with yTrue as ground truth</span>
+<span class="sd">        :type: torch.tensor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_str</span><span class="o">==</span><span class="s1">&#39;MSELoss&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">mse_loss</span><span class="p">(</span><span class="n">yPred</span><span class="p">,</span> <span class="n">yTrue</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_str</span><span class="o">==</span><span class="s1">&#39;CrossEntropyLoss&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">cross_entropy</span><span class="p">(</span><span class="n">yPred</span><span class="p">,</span> <span class="n">yTrue</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_str</span> <span class="ow">in</span> <span class="n">losses</span><span class="o">.</span><span class="n">get_edl_losses</span><span class="p">():</span> <span class="k">return</span> <span class="n">losses</span><span class="o">.</span><span class="n">edl_log_loss</span><span class="p">(</span><span class="n">yPred</span><span class="p">,</span> <span class="n">yTrue</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_epoch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">annealing_step</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EMNISTModel.calculate_accuracy"><a class="viewcode-back" href="../../api/models.html#training.models.EMNISTModel.calculate_accuracy">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_accuracy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yPred</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">yTrue</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Calculate accuracy of forward pass. </span>
+
+<span class="sd">        :param yPred: Output of model </span>
+<span class="sd">        :type yPred: torch.tensor</span>
+<span class="sd">        :param yTrue: Ground truth label</span>
+<span class="sd">        :type yTrue: torch.tensor</span>
+
+<span class="sd">        :return: Mean accuracy of yPred with yTrue as ground truth</span>
+<span class="sd">        :type: torch.tensor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">yPred</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">==</span><span class="n">yTrue</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="EMNISTModel.configure_optimizers"><a class="viewcode-back" href="../../api/models.html#training.models.EMNISTModel.configure_optimizers">[docs]</a>    <span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Configure the optimizer (Adam) for training using a learning rate provided on model initialisation</span>
+
+<span class="sd">        :return: Optimizer set to model parameters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lr</span><span class="p">)</span> </div>
+
+<div class="viewcode-block" id="EMNISTModel.evaluate"><a class="viewcode-back" href="../../api/models.html#training.models.EMNISTModel.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Forward pass a batch (used for train, val and test batches). Each step/epoch is logged with metrics loss and accuracy using Tensorboard.</span>
+
+<span class="sd">        :param batch: Input data as batch</span>
+<span class="sd">        :type batch: torch.tensor</span>
+<span class="sd">        :param batch_idx: Unused but needed in overloading</span>
+<span class="sd">        :type batch_idx: int</span>
+<span class="sd">        :param stage: Name of the current stage i.e. train, val or test. Defaults to None.</span>
+<span class="sd">        :type stage: str, optional</span>
+
+<span class="sd">        :return: Loss and accuracy as keys</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">batch</span>
+        <span class="n">y_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> 
+
+        <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_loss</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+        <span class="n">acc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_accuracy</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">stage</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s2">_loss&quot;</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">on_step</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">on_epoch</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">prog_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s1">_accuracy&#39;</span><span class="p">,</span> <span class="n">acc</span><span class="p">,</span> <span class="n">on_step</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">on_epoch</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">prog_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;loss&#39;</span><span class="p">:</span> <span class="n">loss</span><span class="p">,</span> <span class="s1">&#39;accuracy&#39;</span><span class="p">:</span> <span class="n">acc</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="EMNISTModel.training_step"><a class="viewcode-back" href="../../api/models.html#training.models.EMNISTModel.training_step">[docs]</a>    <span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; On training step, call self.evaluate (forward pass) and return</span>
+
+<span class="sd">        :param batch: Input data as batch</span>
+<span class="sd">        :type batch: torch.tensor</span>
+<span class="sd">        :param batch_idx: Unused but needed in overloading</span>
+<span class="sd">        :type batch_idx: int</span>
+<span class="sd">        </span>
+<span class="sd">        :return: Output from self.evaluate</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="s1">&#39;train&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EMNISTModel.validation_step"><a class="viewcode-back" href="../../api/models.html#training.models.EMNISTModel.validation_step">[docs]</a>    <span class="k">def</span> <span class="nf">validation_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; On validation step, call self.evaluate (forward pass) and return</span>
+
+<span class="sd">        :param batch: Input data as batch</span>
+<span class="sd">        :type batch: torch.tensor</span>
+<span class="sd">        :param batch_idx: Unused but needed in overloading</span>
+<span class="sd">        :type batch_idx: int</span>
+<span class="sd">        </span>
+<span class="sd">        :return: Output from self.evaluate</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EMNISTModel.test_step"><a class="viewcode-back" href="../../api/models.html#training.models.EMNISTModel.test_step">[docs]</a>    <span class="k">def</span> <span class="nf">test_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; On test step, call self.evaluate (forward pass) and return</span>
+
+<span class="sd">        :param batch: Input data as batch</span>
+<span class="sd">        :type batch: torch.tensor</span>
+<span class="sd">        :param batch_idx: Unused but needed in overloading</span>
+<span class="sd">        :type batch_idx: int</span>
+<span class="sd">        </span>
+<span class="sd">        :return: Output from self.evaluate</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="s1">&#39;test&#39;</span><span class="p">)</span></div></div>
+
+<span class="k">class</span> <span class="nc">UrbanModel</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Pytorch Lightning Module wrapping the LeNet pure Pytorch model for training with the EMNISTDataModule using Pytorch Lightning</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loss_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">lr</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param loss_str: Loss function name to use for training. </span>
+<span class="sd">        :type loss_str: str</span>
+<span class="sd">        :param lr: Learning rate for optimizer. </span>
+<span class="sd">        :type lr: float </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">loss_str</span> <span class="o">=</span> <span class="n">loss_str</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">lr</span> <span class="o">=</span> <span class="n">lr</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_device</span> <span class="o">=</span> <span class="n">losses</span><span class="o">.</span><span class="n">fetch_default_device</span><span class="p">()</span> 
+
+        <span class="c1">#self.save_hyperparameters()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">basic_models</span><span class="o">.</span><span class="n">VGGish</span><span class="p">(</span><span class="n">output_size</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">loss_fct</span> <span class="o">=</span> <span class="n">losses</span><span class="o">.</span><span class="n">get_loss_fct</span><span class="p">(</span><span class="n">loss_str</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Model forward pass</span>
+
+<span class="sd">        :param x: Model input</span>
+<span class="sd">        :type x: torch.tensor</span>
+
+<span class="sd">        :return: Model output</span>
+<span class="sd">        :rtype: torch.tensor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> 
+
+    <span class="k">def</span> <span class="nf">calculate_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yPred</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">yTrue</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Calculate loss of model output with respect to ground truth and loss function provided on model initialisation</span>
+
+<span class="sd">        :param yTrue: Ground truth label</span>
+<span class="sd">        :type yTrue: torch.tensor</span>
+<span class="sd">        :param yPred: Output of model </span>
+<span class="sd">        :type yPred: torch.tensor</span>
+
+<span class="sd">        :return: Loss of yPred with yTrue as ground truth</span>
+<span class="sd">        :type: torch.tensor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_str</span><span class="o">==</span><span class="s1">&#39;MSELoss&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">mse_loss</span><span class="p">(</span><span class="n">yPred</span><span class="p">,</span> <span class="n">yTrue</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_str</span><span class="o">==</span><span class="s1">&#39;CrossEntropyLoss&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">cross_entropy</span><span class="p">(</span><span class="n">yPred</span><span class="p">,</span> <span class="n">yTrue</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">calculate_accuracy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yPred</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">yTrue</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Calculate accuracy of forward pass. </span>
+
+<span class="sd">        :param yPred: Output of model </span>
+<span class="sd">        :type yPred: torch.tensor</span>
+<span class="sd">        :param yTrue: Ground truth label</span>
+<span class="sd">        :type yTrue: torch.tensor</span>
+
+<span class="sd">        :return: Mean accuracy of yPred with yTrue as ground truth</span>
+<span class="sd">        :type: torch.tensor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">yPred</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">==</span><span class="n">yTrue</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Configure the optimizer (Adam) for training using a learning rate provided on model initialisation</span>
+
+<span class="sd">        :return: Optimizer set to model parameters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lr</span><span class="p">)</span> 
+
+    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Forward pass a batch (used for train, val and test batches). Each step/epoch is logged with metrics loss and accuracy using Tensorboard.</span>
+
+<span class="sd">        :param batch: Input data as batch</span>
+<span class="sd">        :type batch: torch.tensor</span>
+<span class="sd">        :param batch_idx: Unused but needed in overloading</span>
+<span class="sd">        :type batch_idx: int</span>
+<span class="sd">        :param stage: Name of the current stage i.e. train, val or test. Defaults to None.</span>
+<span class="sd">        :type stage: str, optional</span>
+
+<span class="sd">        :return: Loss and accuracy as keys</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">batch</span>
+        <span class="n">y_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> 
+
+        <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_loss</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+        <span class="n">acc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_accuracy</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">stage</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s2">_loss&quot;</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">on_step</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">on_epoch</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">prog_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s1">_accuracy&#39;</span><span class="p">,</span> <span class="n">acc</span><span class="p">,</span> <span class="n">on_step</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">on_epoch</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">prog_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;loss&#39;</span><span class="p">:</span> <span class="n">loss</span><span class="p">,</span> <span class="s1">&#39;accuracy&#39;</span><span class="p">:</span> <span class="n">acc</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; On training step, call self.evaluate (forward pass) and return</span>
+
+<span class="sd">        :param batch: Input data as batch</span>
+<span class="sd">        :type batch: torch.tensor</span>
+<span class="sd">        :param batch_idx: Unused but needed in overloading</span>
+<span class="sd">        :type batch_idx: int</span>
+<span class="sd">        </span>
+<span class="sd">        :return: Output from self.evaluate</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="s1">&#39;train&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">validation_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; On validation step, call self.evaluate (forward pass) and return</span>
+
+<span class="sd">        :param batch: Input data as batch</span>
+<span class="sd">        :type batch: torch.tensor</span>
+<span class="sd">        :param batch_idx: Unused but needed in overloading</span>
+<span class="sd">        :type batch_idx: int</span>
+<span class="sd">        </span>
+<span class="sd">        :return: Output from self.evaluate</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; On test step, call self.evaluate (forward pass) and return</span>
+
+<span class="sd">        :param batch: Input data as batch</span>
+<span class="sd">        :type batch: torch.tensor</span>
+<span class="sd">        :param batch_idx: Unused but needed in overloading</span>
+<span class="sd">        :type batch_idx: int</span>
+<span class="sd">        </span>
+<span class="sd">        :return: Output from self.evaluate</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="s1">&#39;test&#39;</span><span class="p">)</span>
+
+
+<span class="c1">#TODO: on train end, val end and test end (epoch) - log/print confusion matrix </span>
+
+
+
+
+<div class="viewcode-block" id="get_model"><a class="viewcode-back" href="../../api/models.html#training.models.get_model">[docs]</a><span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span><span class="n">model_name_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pl</span><span class="o">.</span><span class="n">LightningModule</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Get the Pytorch Lightning module associated with the string given, which is defined in the config file</span>
+<span class="sd">    :param model_name_str: Name of the module to return</span>
+<span class="sd">    :type model_name_str: str</span>
+
+<span class="sd">    :return: The Pytorch Lightning module</span>
+<span class="sd">    :rtype: pytorch_lightning.LightningModule</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">model_name_str</span><span class="o">==</span><span class="s1">&#39;MNISTModel&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="n">MNISTModel</span>
+    <span class="k">elif</span> <span class="n">model_name_str</span><span class="o">==</span><span class="s1">&#39;EMNISTModel&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="n">EMNISTModel</span>
+    <span class="k">elif</span> <span class="n">model_name_str</span><span class="o">==</span><span class="s1">&#39;UrbanModel&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="n">UrbanModel</span></div>
+
+<div class="viewcode-block" id="check_reasoning_logic"><a class="viewcode-back" href="../../api/models.html#training.models.check_reasoning_logic">[docs]</a><span class="k">def</span> <span class="nf">check_reasoning_logic</span><span class="p">(</span><span class="n">reasoning_model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">ce_fsm_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">ce_time_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">num_primitive_events</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">window_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Check the logic of the reasoning model through all possible permutations of windowed primitive events to ensure that this layer will correctly label each instance.</span>
+
+<span class="sd">    :param reasoning_model: The reasoning model to check.</span>
+<span class="sd">    :type reasoning_model: nn.Module (or a class that inherits nn.Module, e.g. pytorch_lightning.LightningModule)</span>
+<span class="sd">    :param ce_fsm_list: Pattern of primitive events for each complex event.</span>
+<span class="sd">    :type ce_fsm_list: list</span>
+<span class="sd">    :param ce_time_list: Temporal metadata pattern for each complex event</span>
+<span class="sd">    :type ce_time_list: list</span>
+<span class="sd">    :param num_primitive_events: Number of primitive events i.e. size of one hot primitive event vectors. </span>
+<span class="sd">    :type num_primitive_events: int</span>
+<span class="sd">    :param window_size: Size of the window of primitive events. </span>
+<span class="sd">    :type window_size: int</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">default_device</span> <span class="o">=</span> <span class="n">losses</span><span class="o">.</span><span class="n">fetch_default_device</span><span class="p">()</span>
+    <span class="n">reasoning_model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">default_device</span><span class="p">)</span>
+    <span class="n">verify_result</span> <span class="o">=</span> <span class="kc">True</span> 
+    <span class="n">uniq_event</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">((</span><span class="n">num_primitive_events</span><span class="p">)))</span> 
+    <span class="n">total_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">uniq_event</span><span class="p">)</span><span class="o">**</span><span class="n">window_size</span>
+    <span class="n">nums</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">product_list</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">uniq_event</span><span class="p">,</span> <span class="n">repeat</span><span class="o">=</span><span class="n">window_size</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">product_list</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="n">total_len</span><span class="p">):</span>
+        <span class="n">event_stream</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>  
+        <span class="n">event_feature</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">window_size</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">uniq_event</span><span class="p">)])</span>
+        <span class="n">event_feature</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">window_size</span><span class="p">),</span> <span class="n">event_stream</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">complex_event</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_complex_label</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">event_feature</span><span class="p">),</span> <span class="n">ce_fsm_list</span><span class="p">,</span> <span class="n">ce_time_list</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">default_device</span><span class="p">)</span>
+
+        <span class="n">event_feature</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">event_feature</span><span class="p">])</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">default_device</span><span class="p">)</span>
+        <span class="n">yPred</span> <span class="o">=</span> <span class="n">reasoning_model</span><span class="p">(</span><span class="n">event_feature</span><span class="p">)</span>
+        
+        <span class="n">logic_match</span> <span class="o">=</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">yPred</span><span class="p">)</span><span class="o">==</span><span class="n">complex_event</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">logic_match</span><span class="p">:</span>
+            <span class="n">verify_result</span> <span class="o">=</span> <span class="kc">False</span> 
+            <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> 
+            <span class="k">break</span> 
+    
+    <span class="k">if</span> <span class="n">verify_result</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Successful, all possible permutations are correct&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Above window failed logical check&quot;</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Cai Davies.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

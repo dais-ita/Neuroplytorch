@@ -1,0 +1,104 @@
+DETAILS:
+  NAME: EMNIST experiment
+  DISCRIPTION: Example of Neuroplytorch with EMNIST dataset and arbitrary complex events for proof of concept
+
+TRAINING:
+  NUM_PRIMITIVE_EVENTS: 26
+  WINDOW_SIZE: 10
+  DATASET:
+    NAME: EMNIST
+    TYPE: Pytorch Dataset
+    LOCATION: datasets/EMNIST
+
+  REASONING:
+    LOSS_FUNCTION: MSELoss
+    LEARNING_RATE: 0.001 
+    EPOCHS: 1000
+    
+    PARAMETERS:
+      DATASET:
+        zero_windows: True
+        count_windows: False 
+        num_workers: 2
+        num_data: 1000000
+      MODEL:
+        hidden_size: 64
+        use_relu: False 
+
+
+  NEUROPLYTORCH: 
+    LEARNING_RATE: 0.001
+    LOSS_FUNCTION: MSELoss
+    EPOCHS: 300 
+    
+    PARAMETERS:
+      DATASET:
+        no_test: True
+        num_workers: 2
+        zero_windows:
+          train: True
+          val: True
+          test: True
+        count_windows:
+          train: False
+          val: False
+          test: False
+
+
+  PERCEPTION:
+    MODEL: LeNet
+    PRETRAIN:
+      MODEL_MODULE: EMNISTModel
+      DATA_MODULE: EMNISTDataModule
+      LOSS_FUNCTION: CrossEntropyLoss 
+      LEARNING_RATE: 0.001
+      PRETRAIN_PERCEPTION: True
+      PRETRAIN_EPOCHS: 3
+      
+      
+      PARAMETERS: 
+          
+        DATASET:
+          batch_size: 64 
+          num_workers: 2
+
+
+
+
+COMPLEX EVENTS:
+  COMPLEX EVENT 1: 
+    PATTERN: [0,1,2]
+    EVENTS_BETWEEN: [0,0]
+    MAX_TIME: [INF, INF]
+  COMPLEX EVENT 2: 
+    PATTERN: [3,4,5]
+    EVENTS_BETWEEN: [0,0]
+    MAX_TIME: [INF, INF]
+  COMPLEX EVENT 3: 
+    PATTERN: [6,7,8]
+    EVENTS_BETWEEN: [0,0]
+    MAX_TIME: [INF, INF]
+  COMPLEX EVENT 4: 
+    PATTERN: [9,10,11]
+    EVENTS_BETWEEN: [0,0]
+    MAX_TIME: [INF, INF]
+  COMPLEX EVENT 5: 
+    PATTERN: [12,13,14]
+    EVENTS_BETWEEN: [0,0]
+    MAX_TIME: [INF, INF]
+  COMPLEX EVENT 6: 
+    PATTERN: [15,16,17]
+    EVENTS_BETWEEN: [0,0]
+    MAX_TIME: [INF, INF]
+  COMPLEX EVENT 7: 
+   PATTERN: [18,19,20]
+   EVENTS_BETWEEN: [0,0]
+   MAX_TIME: [INF, INF]
+  COMPLEX EVENT 8: 
+    PATTERN: [21,22,23]
+    EVENTS_BETWEEN: [0,0]
+    MAX_TIME: [INF, INF]
+  COMPLEX EVENT 9: 
+    PATTERN: [24,25]
+    EVENTS_BETWEEN: [0]
+    MAX_TIME: [INF]

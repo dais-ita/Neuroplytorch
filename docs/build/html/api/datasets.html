@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Datasets module &mdash; Neuroplytorch 1.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Data module" href="data.html" />
+    <link rel="prev" title="Models module" href="models.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Neuroplytorch
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to Neuroplytorch’s documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../how_to.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="basic_models.html">Basic Models module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html">Models module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Datasets module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#dataset-classes">Dataset classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#basicdataset">BasicDataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#endenddataset">EndEndDataset</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pytorch-lightning-data-modules">Pytorch Lightning data modules</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#reasoningdatamodule">ReasoningDataModule</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#perceptionwindowdatamodule">PerceptionWindowDataModule</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#endtoenddatamodule">EndToEndDataModule</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#endtoendnotestdatamodule">EndToEndNoTestDataModule</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#mnistdatamodule">MNISTDataModule</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#emnistdatamodule">EMNISTDataModule</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#methods">Methods</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="data.html">Data module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="losses.html">Losses module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parser.html">Parser module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Neuroplytorch</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">API documentation</a> &raquo;</li>
+      <li>Datasets module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/datasets.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="datasets-module">
+<span id="datasets-page"></span><h1>Datasets module<a class="headerlink" href="#datasets-module" title="Permalink to this headline"></a></h1>
+<section id="dataset-classes">
+<h2>Dataset classes<a class="headerlink" href="#dataset-classes" title="Permalink to this headline"></a></h2>
+<section id="basicdataset">
+<h3>BasicDataset<a class="headerlink" href="#basicdataset" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="data.datasets.BasicDataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.datasets.</span></span><span class="sig-name descname"><span class="pre">BasicDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#BasicDataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.BasicDataset" title="Permalink to this definition"></a></dt>
+<dd><p>Basic Pytorch dataset, where data is held in ‘x’ and labels held in ‘label’</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.BasicDataset.__getitem__">
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/data/datasets.html#BasicDataset.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.BasicDataset.__getitem__" title="Permalink to this definition"></a></dt>
+<dd><p>Return dict of next item x and label</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>idx</strong> (<em>int</em>) – Index</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dict with keys: x, label for data and label</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.BasicDataset.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#BasicDataset.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.BasicDataset.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Pass through data, labels and intermediate labels</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>iterable</em>) – Data</p></li>
+<li><p><strong>labels</strong> (<em>iterable</em><em>, </em><em>optional</em>) – Labels. Defaults to None.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.BasicDataset.__len__">
+<span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="../_modules/data/datasets.html#BasicDataset.__len__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.BasicDataset.__len__" title="Permalink to this definition"></a></dt>
+<dd><p>Get length of dataset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Length of dataset</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="endenddataset">
+<h3>EndEndDataset<a class="headerlink" href="#endenddataset" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="data.datasets.EndEndDataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.datasets.</span></span><span class="sig-name descname"><span class="pre">EndEndDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels_intermediate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#EndEndDataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.EndEndDataset" title="Permalink to this definition"></a></dt>
+<dd><p>Dataset for end-to-end Neuroplytorch training, which has labels and intermediate labels, i.e. the labels for the perception model.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.EndEndDataset.__getitem__">
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/data/datasets.html#EndEndDataset.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.EndEndDataset.__getitem__" title="Permalink to this definition"></a></dt>
+<dd><p>Return dict of next item x, label and intermediate label</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>idx</strong> (<em>int</em>) – Index</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dict with keys: x, label, label_intermediate for data, label and intermediate label</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.EndEndDataset.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels_intermediate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#EndEndDataset.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.EndEndDataset.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Pass through data, labels and intermediate labels</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>iterable</em>) – Data</p></li>
+<li><p><strong>labels</strong> (<em>iterable</em><em>, </em><em>optional</em>) – Labels. Defaults to None.</p></li>
+<li><p><strong>labels_intermediate</strong> (<em>iterable</em><em>, </em><em>optional</em>) – Intermediate (perception model) labels. Defaults to None.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.EndEndDataset.__len__">
+<span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="../_modules/data/datasets.html#EndEndDataset.__len__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.EndEndDataset.__len__" title="Permalink to this definition"></a></dt>
+<dd><p>Get length of dataset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Length of dataset</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+<section id="pytorch-lightning-data-modules">
+<h2>Pytorch Lightning data modules<a class="headerlink" href="#pytorch-lightning-data-modules" title="Permalink to this headline"></a></h2>
+<section id="reasoningdatamodule">
+<h3>ReasoningDataModule<a class="headerlink" href="#reasoningdatamodule" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="data.datasets.ReasoningDataModule">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.datasets.</span></span><span class="sig-name descname"><span class="pre">ReasoningDataModule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#ReasoningDataModule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.ReasoningDataModule" title="Permalink to this definition"></a></dt>
+<dd><p>Pytorch lightning data module for reasoning model training. Will create a synthetic dataset from given parameters to train the reasoning
+model.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.ReasoningDataModule.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ce_fsm_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ce_time_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_primitive_events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zero_windows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count_windows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_split</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_split</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#ReasoningDataModule.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.ReasoningDataModule.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Init function for ReasoningDataModule</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ce_fsm_list</strong> (<em>list</em>) – Pattern of primitive events for each complex event.</p></li>
+<li><p><strong>ce_time_list</strong> (<em>list</em>) – Temporal metadata pattern for each complex event</p></li>
+<li><p><strong>num_primitive_events</strong> (<em>int</em>) – Number of primitive events i.e. size of one hot primitive event vectors.</p></li>
+<li><p><strong>window_size</strong> (<em>int</em>) – Size of the window of primitive events.</p></li>
+<li><p><strong>zero_windows</strong> (<em>bool</em><em>, </em><em>optional</em>) – Include windows that have no complex events if True. Defaults to False.</p></li>
+<li><p><strong>count_windows</strong> (<em>bool. optional</em>) – Complex label is a count of complex events if True, otherwise a boolean vector where a complex event is 1 if there is at least one instance of that complex event. Defaults to False.</p></li>
+<li><p><strong>num_data</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of data items to generate. Defaults to 1000000.</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em><em>, </em><em>optional</em>) – Batch size of dataset loader. Defaults to 256.</p></li>
+<li><p><strong>num_workers</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of CPU cores to load data. Defaults to int(os.cpu_count()/2).</p></li>
+<li><p><strong>val_split</strong> (<em>float</em><em>, </em><em>optional</em>) – Train-Validation split. Defaults to 0.2.</p></li>
+<li><p><strong>test_split</strong> (<em>float</em><em>, </em><em>optional</em>) – Train/Validation-Test split. Defaults to 0.2.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.ReasoningDataModule.prepare_data">
+<span class="sig-name descname"><span class="pre">prepare_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#ReasoningDataModule.prepare_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.ReasoningDataModule.prepare_data" title="Permalink to this definition"></a></dt>
+<dd><p>Generate windowed primitive events and complex labels for reasoning model training</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.ReasoningDataModule.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#ReasoningDataModule.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.ReasoningDataModule.setup" title="Permalink to this definition"></a></dt>
+<dd><p>Preprocess data depending on the stage (fit or test)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>stage</strong> (<em>str</em><em>, </em><em>optional</em>) – String denoting the stage needed i.e. fit or test. Defaults to None, which is equivalent to fit.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.ReasoningDataModule.test_dataloader">
+<span class="sig-name descname"><span class="pre">test_dataloader</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#ReasoningDataModule.test_dataloader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.ReasoningDataModule.test_dataloader" title="Permalink to this definition"></a></dt>
+<dd><p>Return Pytorch DataLoader for test dataset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.utils.data.DataLoader</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.ReasoningDataModule.train_dataloader">
+<span class="sig-name descname"><span class="pre">train_dataloader</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#ReasoningDataModule.train_dataloader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.ReasoningDataModule.train_dataloader" title="Permalink to this definition"></a></dt>
+<dd><p>Return Pytorch DataLoader for train dataset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.utils.data.DataLoader</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.ReasoningDataModule.val_dataloader">
+<span class="sig-name descname"><span class="pre">val_dataloader</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#ReasoningDataModule.val_dataloader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.ReasoningDataModule.val_dataloader" title="Permalink to this definition"></a></dt>
+<dd><p>Return Pytorch DataLoader for validation dataset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.utils.data.DataLoader</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="perceptionwindowdatamodule">
+<h3>PerceptionWindowDataModule<a class="headerlink" href="#perceptionwindowdatamodule" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="data.datasets.PerceptionWindowDataModule">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.datasets.</span></span><span class="sig-name descname"><span class="pre">PerceptionWindowDataModule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#PerceptionWindowDataModule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.PerceptionWindowDataModule" title="Permalink to this definition"></a></dt>
+<dd><p>Dataset for training a perception model using windowed data. Useful for training a perception model similarly to end-to-end
+training but using the intermediate labels to calculate loss</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.PerceptionWindowDataModule.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_primitive_events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_split</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_split</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#PerceptionWindowDataModule.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.PerceptionWindowDataModule.__init__" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset</strong> (<em>tuple</em>) – Tuple with keys ‘train’ and ‘test’, each of which holds a dataset (train and test set respectively). The dataset must be in a format that is iterable, where it can be iterated as data,label pairs. For example, can be a list of tuples, or a Pytorch dataset.</p></li>
+<li><p><strong>num_primitive_events</strong> (<em>int</em>) – Number of primitive events i.e. size of one hot primitive event vectors.</p></li>
+<li><p><strong>window_size</strong> (<em>int</em>) – Size of the window of primitive events.</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em>) – Batch size of dataset loader. Defaults to 256.</p></li>
+<li><p><strong>num_workers</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of CPU cores to load data. Defaults to int(os.cpu_count()/2).</p></li>
+<li><p><strong>val_split</strong> (<em>float</em><em>, </em><em>optional</em>) – Train-Validation split. Defaults to 0.2.</p></li>
+<li><p><strong>test_split</strong> (<em>float</em><em>, </em><em>optional</em>) – Train/Validation-Test split. Defaults to 0.2.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.PerceptionWindowDataModule.prepare_data">
+<span class="sig-name descname"><span class="pre">prepare_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#PerceptionWindowDataModule.prepare_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.PerceptionWindowDataModule.prepare_data" title="Permalink to this definition"></a></dt>
+<dd><p>Generate windowed raw input data for training a perception model using windowed data</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.PerceptionWindowDataModule.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#PerceptionWindowDataModule.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.PerceptionWindowDataModule.setup" title="Permalink to this definition"></a></dt>
+<dd><p>Preprocess data depending on the stage (fit or test)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>stage</strong> (<em>str</em><em>, </em><em>optional</em>) – String denoting the stage needed i.e. fit or test. Defaults to None, which is equivalent to fit.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.PerceptionWindowDataModule.test_dataloader">
+<span class="sig-name descname"><span class="pre">test_dataloader</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#PerceptionWindowDataModule.test_dataloader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.PerceptionWindowDataModule.test_dataloader" title="Permalink to this definition"></a></dt>
+<dd><p>Return Pytorch DataLoader for test dataset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.utils.data.DataLoader</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.PerceptionWindowDataModule.train_dataloader">
+<span class="sig-name descname"><span class="pre">train_dataloader</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#PerceptionWindowDataModule.train_dataloader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.PerceptionWindowDataModule.train_dataloader" title="Permalink to this definition"></a></dt>
+<dd><p>Return Pytorch DataLoader for train dataset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.utils.data.DataLoader</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.PerceptionWindowDataModule.val_dataloader">
+<span class="sig-name descname"><span class="pre">val_dataloader</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#PerceptionWindowDataModule.val_dataloader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.PerceptionWindowDataModule.val_dataloader" title="Permalink to this definition"></a></dt>
+<dd><p>Return Pytorch DataLoader for validation dataset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.utils.data.DataLoader</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="endtoenddatamodule">
+<h3>EndToEndDataModule<a class="headerlink" href="#endtoenddatamodule" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="data.datasets.EndToEndDataModule">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.datasets.</span></span><span class="sig-name descname"><span class="pre">EndToEndDataModule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#EndToEndDataModule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.EndToEndDataModule" title="Permalink to this definition"></a></dt>
+<dd><p>Pytorch Lightning data module to create the end-to-end training dataset for Neuroplytorch. Given a raw input dataset (e.g. MNIST) and the complex event parameters (patterns and metadata),
+this will preprocess the data to create the windowed data and necessary labels for end-to-end training. Especially useful in conjunction with the Pytorch Lightning Neuroplytorch model for
+easy and automated training.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.EndToEndDataModule.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ce_fsm_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ce_time_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_primitive_events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zero_windows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{'test':</span> <span class="pre">True,</span> <span class="pre">'train':</span> <span class="pre">True,</span> <span class="pre">'val':</span> <span class="pre">True}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count_windows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{'test':</span> <span class="pre">False,</span> <span class="pre">'train':</span> <span class="pre">False,</span> <span class="pre">'val':</span> <span class="pre">False}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_split</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#EndToEndDataModule.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.EndToEndDataModule.__init__" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset</strong> (<em>tuple</em>) – Tuple with keys ‘train’ and ‘test’, each of which holds a dataset (train and test set respectively). The dataset must be in a format that is iterable, where it can be iterated as data,label pairs. For example, can be a list of tuples, or a Pytorch dataset.</p></li>
+<li><p><strong>ce_fsm_list</strong> (<em>list</em>) – Pattern of primitive events for each complex event</p></li>
+<li><p><strong>ce_time_list</strong> (<em>list</em>) – Temporal metadata pattern for each complex event</p></li>
+<li><p><strong>num_primitive_events</strong> (<em>int</em>) – Number of primitive events i.e. size of one hot primitive event vectors.</p></li>
+<li><p><strong>window_size</strong> (<em>int</em>) – Size of the window of primitive events.</p></li>
+<li><p><strong>zero_windows</strong> (<em>dict</em><em>, </em><em>optional</em>) – Include windows that have no complex events if True. Dict of ‘train’, ‘val’ and ‘test’ to define this for each set, for example so the train set can exclude no complex event windows, but the validation set doesn’t exclude. Defaults to {‘train’: True, ‘val’: True, ‘test’: True}.</p></li>
+<li><p><strong>count_windows</strong> (<em>dict</em><em>, </em><em>optional</em>) – Complex label is a count of complex events if True. Dict of ‘train’, ‘val’ and ‘test’ to define this for each set. Defaults to {‘train’: False, ‘val’: False, ‘test’: False}.</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em><em>, </em><em>optional</em>) – Batch size of dataset loader. Defaults to 256.</p></li>
+<li><p><strong>num_workers</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of CPU cores to load data. Defaults to int(os.cpu_count()/2).</p></li>
+<li><p><strong>val_split</strong> (<em>float</em><em>, </em><em>optional</em>) – Train-Validation split for the train dataset. Defaults to 0.2.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.EndToEndDataModule.prepare_data">
+<span class="sig-name descname"><span class="pre">prepare_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#EndToEndDataModule.prepare_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.EndToEndDataModule.prepare_data" title="Permalink to this definition"></a></dt>
+<dd><p>Generate windowed raw input data with complex event labels for end to end training.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.EndToEndDataModule.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#EndToEndDataModule.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.EndToEndDataModule.setup" title="Permalink to this definition"></a></dt>
+<dd><p>Preprocess data depending on the stage (fit or test)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>stage</strong> (<em>str</em><em>, </em><em>optional</em>) – String denoting the stage needed i.e. fit or test. Defaults to None, which is equivalent to fit.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.EndToEndDataModule.test_dataloader">
+<span class="sig-name descname"><span class="pre">test_dataloader</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#EndToEndDataModule.test_dataloader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.EndToEndDataModule.test_dataloader" title="Permalink to this definition"></a></dt>
+<dd><p>Return Pytorch DataLoader for test dataset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.utils.data.DataLoader</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.EndToEndDataModule.train_dataloader">
+<span class="sig-name descname"><span class="pre">train_dataloader</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#EndToEndDataModule.train_dataloader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.EndToEndDataModule.train_dataloader" title="Permalink to this definition"></a></dt>
+<dd><p>Return Pytorch DataLoader for train dataset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.utils.data.DataLoader</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.EndToEndDataModule.val_dataloader">
+<span class="sig-name descname"><span class="pre">val_dataloader</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#EndToEndDataModule.val_dataloader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.EndToEndDataModule.val_dataloader" title="Permalink to this definition"></a></dt>
+<dd><p>Return Pytorch DataLoader for validation dataset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.utils.data.DataLoader</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="endtoendnotestdatamodule">
+<h3>EndToEndNoTestDataModule<a class="headerlink" href="#endtoendnotestdatamodule" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="data.datasets.EndToEndNoTestDataModule">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.datasets.</span></span><span class="sig-name descname"><span class="pre">EndToEndNoTestDataModule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#EndToEndNoTestDataModule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.EndToEndNoTestDataModule" title="Permalink to this definition"></a></dt>
+<dd><p>Pytorch Lightning data module to create the end-to-end training dataset for Neuroplytorch. Given a raw input dataset (e.g. MNIST) and the complex event parameters (patterns and metadata),
+this will preprocess the data to create the windowed data and necessary labels for end-to-end training. Especially useful in conjunction with the Pytorch Lightning Neuroplytorch model for
+easy and automated training. Similar to EndToEndDataModule except uses the test set of the given dataset as the validation set, with no test set.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.EndToEndNoTestDataModule.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ce_fsm_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ce_time_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_primitive_events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zero_windows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{'test':</span> <span class="pre">True,</span> <span class="pre">'train':</span> <span class="pre">True,</span> <span class="pre">'val':</span> <span class="pre">True}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count_windows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{'test':</span> <span class="pre">False,</span> <span class="pre">'train':</span> <span class="pre">False,</span> <span class="pre">'val':</span> <span class="pre">False}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_split</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#EndToEndNoTestDataModule.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.EndToEndNoTestDataModule.__init__" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset</strong> (<em>tuple</em>) – Tuple with keys ‘train’ and ‘test’, each of which holds a dataset (train and test set respectively). The dataset must be in a format that is iterable, where it can be iterated as data,label pairs. For example, can be a list of tuples, or a Pytorch dataset.</p></li>
+<li><p><strong>ce_fsm_list</strong> (<em>list</em>) – Pattern of primitive events for each complex event</p></li>
+<li><p><strong>ce_time_list</strong> (<em>list</em>) – Temporal metadata pattern for each complex event</p></li>
+<li><p><strong>num_primitive_events</strong> (<em>int</em>) – Number of primitive events i.e. size of one hot primitive event vectors.</p></li>
+<li><p><strong>window_size</strong> (<em>int</em>) – Size of the window of primitive events.</p></li>
+<li><p><strong>zero_windows</strong> (<em>dict</em><em>, </em><em>optional</em>) – Include windows that have no complex events if True. Dict of ‘train’, ‘val’ and ‘test’ to define this for each set, for example so the train set can exclude no complex event windows, but the validation set doesn’t exclude. Defaults to {‘train’: True, ‘val’: True, ‘test’: True}.</p></li>
+<li><p><strong>count_windows</strong> (<em>dict</em><em>, </em><em>optional</em>) – Complex label is a count of complex events if True. Dict of ‘train’, ‘val’ and ‘test’ to define this for each set. Defaults to {‘train’: False, ‘val’: False, ‘test’: False}.</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em><em>, </em><em>optional</em>) – Batch size of dataset loader. Defaults to 256.</p></li>
+<li><p><strong>num_workers</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of CPU cores to load data. Defaults to int(os.cpu_count()/2).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.EndToEndNoTestDataModule.prepare_data">
+<span class="sig-name descname"><span class="pre">prepare_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#EndToEndNoTestDataModule.prepare_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.EndToEndNoTestDataModule.prepare_data" title="Permalink to this definition"></a></dt>
+<dd><p>Generate windowed raw input data with complex event labels for end to end training.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.EndToEndNoTestDataModule.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#EndToEndNoTestDataModule.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.EndToEndNoTestDataModule.setup" title="Permalink to this definition"></a></dt>
+<dd><p>Preprocess data depending on the stage (fit or test)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>stage</strong> (<em>str</em><em>, </em><em>optional</em>) – String denoting the stage needed i.e. fit or test. Defaults to None, which is equivalent to fit.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.EndToEndNoTestDataModule.train_dataloader">
+<span class="sig-name descname"><span class="pre">train_dataloader</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#EndToEndNoTestDataModule.train_dataloader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.EndToEndNoTestDataModule.train_dataloader" title="Permalink to this definition"></a></dt>
+<dd><p>Return Pytorch DataLoader for train dataset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.utils.data.DataLoader</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.EndToEndNoTestDataModule.val_dataloader">
+<span class="sig-name descname"><span class="pre">val_dataloader</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#EndToEndNoTestDataModule.val_dataloader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.EndToEndNoTestDataModule.val_dataloader" title="Permalink to this definition"></a></dt>
+<dd><p>Return Pytorch DataLoader for validation dataset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.utils.data.DataLoader</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="mnistdatamodule">
+<h3>MNISTDataModule<a class="headerlink" href="#mnistdatamodule" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="data.datasets.MNISTDataModule">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.datasets.</span></span><span class="sig-name descname"><span class="pre">MNISTDataModule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#MNISTDataModule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.MNISTDataModule" title="Permalink to this definition"></a></dt>
+<dd><p>Pytorch Lightning data module for MNIST dataset. Will load MNIST dataset from torchvision and cache locally in ./datasets/MNIST folder.
+Used for automatic data preprocessing, loading etc. for use with Pytorch Lightning module.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.MNISTDataModule.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./datasets/MNIST'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#MNISTDataModule.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.MNISTDataModule.__init__" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data_dir</strong> (<em>str</em><em>, </em><em>optional</em>) – Directory to save local copy of dataset for offline caching. Defaults to “./datasets/MNIST”.</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em><em>, </em><em>optional</em>) – Batch size of dataset loader. Defaults to 256.</p></li>
+<li><p><strong>num_workers</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of CPU cores to load data. Defaults to int(os.cpu_count()/2).</p></li>
+<li><p><strong>val_split</strong> (<em>float</em><em>, </em><em>optional</em>) – Train-Validation split for the train dataset. Defaults to 0.2.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.MNISTDataModule.prepare_data">
+<span class="sig-name descname"><span class="pre">prepare_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#MNISTDataModule.prepare_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.MNISTDataModule.prepare_data" title="Permalink to this definition"></a></dt>
+<dd><p>Pytorch lightning overloaded method to prepare the data</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.MNISTDataModule.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#MNISTDataModule.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.MNISTDataModule.setup" title="Permalink to this definition"></a></dt>
+<dd><p>Preprocess data depending on the stage (fit or test)</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>stage (str, optional): String denoting the stage needed i.e. fit or test. Defaults to None, which is equivalent to fit.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.MNISTDataModule.test_dataloader">
+<span class="sig-name descname"><span class="pre">test_dataloader</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#MNISTDataModule.test_dataloader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.MNISTDataModule.test_dataloader" title="Permalink to this definition"></a></dt>
+<dd><p>Return Pytorch DataLoader for test dataset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.utils.data.DataLoader</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.MNISTDataModule.train_dataloader">
+<span class="sig-name descname"><span class="pre">train_dataloader</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#MNISTDataModule.train_dataloader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.MNISTDataModule.train_dataloader" title="Permalink to this definition"></a></dt>
+<dd><p>Return Pytorch DataLoader for train dataset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.utils.data.DataLoader</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.MNISTDataModule.val_dataloader">
+<span class="sig-name descname"><span class="pre">val_dataloader</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#MNISTDataModule.val_dataloader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.MNISTDataModule.val_dataloader" title="Permalink to this definition"></a></dt>
+<dd><p>Return Pytorch DataLoader for validation dataset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.utils.data.DataLoader</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="emnistdatamodule">
+<h3>EMNISTDataModule<a class="headerlink" href="#emnistdatamodule" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="data.datasets.EMNISTDataModule">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.datasets.</span></span><span class="sig-name descname"><span class="pre">EMNISTDataModule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#EMNISTDataModule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.EMNISTDataModule" title="Permalink to this definition"></a></dt>
+<dd><p>Pytorch Lightning data module for EMNIST dataset. Will load EMNIST dataset from torchvision and cache locally in ./datasets/EMNIST folder.
+Used for automatic data preprocessing, loading etc. for use with Pytorch Lightning module.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.EMNISTDataModule.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./datasets/EMNIST'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#EMNISTDataModule.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.EMNISTDataModule.__init__" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data_dir</strong> (<em>str</em><em>, </em><em>optional</em>) – Directory to save local copy of dataset for offline caching. Defaults to “./datasets/EMNIST”.</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em><em>, </em><em>optional</em>) – Batch size of dataset loader. Defaults to 256.</p></li>
+<li><p><strong>num_workers</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of CPU cores to load data. Defaults to int(os.cpu_count()/2).</p></li>
+<li><p><strong>val_split</strong> (<em>float</em><em>, </em><em>optional</em>) – Train-Validation split for the train dataset. Defaults to 0.2.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.EMNISTDataModule.prepare_data">
+<span class="sig-name descname"><span class="pre">prepare_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#EMNISTDataModule.prepare_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.EMNISTDataModule.prepare_data" title="Permalink to this definition"></a></dt>
+<dd><p>Pytorch lightning overloaded method to prepare the data</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.EMNISTDataModule.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#EMNISTDataModule.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.EMNISTDataModule.setup" title="Permalink to this definition"></a></dt>
+<dd><p>Preprocess data depending on the stage (fit or test)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>stage</strong> (<em>str</em><em>, </em><em>optional</em>) – String denoting the stage needed i.e. fit or test. Defaults to None, which is equivalent to fit.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.EMNISTDataModule.test_dataloader">
+<span class="sig-name descname"><span class="pre">test_dataloader</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#EMNISTDataModule.test_dataloader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.EMNISTDataModule.test_dataloader" title="Permalink to this definition"></a></dt>
+<dd><p>Return Pytorch DataLoader for test dataset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.utils.data.DataLoader</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.EMNISTDataModule.train_dataloader">
+<span class="sig-name descname"><span class="pre">train_dataloader</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#EMNISTDataModule.train_dataloader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.EMNISTDataModule.train_dataloader" title="Permalink to this definition"></a></dt>
+<dd><p>Return Pytorch DataLoader for train dataset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.utils.data.DataLoader</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.datasets.EMNISTDataModule.val_dataloader">
+<span class="sig-name descname"><span class="pre">val_dataloader</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/datasets.html#EMNISTDataModule.val_dataloader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.EMNISTDataModule.val_dataloader" title="Permalink to this definition"></a></dt>
+<dd><p>Return Pytorch DataLoader for validation dataset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.utils.data.DataLoader</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+<section id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this headline"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="data.datasets.get_datamodule">
+<span class="sig-prename descclassname"><span class="pre">data.datasets.</span></span><span class="sig-name descname"><span class="pre">get_datamodule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datamodule_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pytorch_lightning.core.datamodule.LightningDataModule</span></span></span><a class="reference internal" href="../_modules/data/datasets.html#get_datamodule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.get_datamodule" title="Permalink to this definition"></a></dt>
+<dd><p>Fetch the Pytorch Lightning DataModule specified by the string datamodule_str</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>datamodule_str</strong> (<em>str</em>) – Name of the Pytorch Lightning DataModule to return</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>pytorch_lightning.LightningDataModule</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data.datasets.fetch_perception_data">
+<span class="sig-prename descclassname"><span class="pre">data.datasets.</span></span><span class="sig-name descname"><span class="pre">fetch_perception_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_loc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'./datasets/MNIST'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/data/datasets.html#fetch_perception_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.fetch_perception_data" title="Permalink to this definition"></a></dt>
+<dd><p>Fetch raw input data from torchvision datasets</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset_str</strong> (<em>str</em>) – Name of dataset from torchvision to fetch. Examples include MNIST, EMNIST etc.</p></li>
+<li><p><strong>dataset_loc</strong> (<em>str</em><em>, </em><em>optional</em>) – Directory to save a local copy of the dataset for offline caching. Defaults to ./datasets/MNIST</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dictionary with keys for ‘train’ and ‘test’ split, each of which holds a torch.utils.data.Dataset dataset</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data.datasets.fetch_perception_data_local">
+<span class="sig-prename descclassname"><span class="pre">data.datasets.</span></span><span class="sig-name descname"><span class="pre">fetch_perception_data_local</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_loc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/data/datasets.html#fetch_perception_data_local"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.datasets.fetch_perception_data_local" title="Permalink to this definition"></a></dt>
+<dd><p>Fetch raw input data from datasets folder</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset_loc</strong> (<em>str</em>) – Location of dataset directory.</p></li>
+<li><p><strong>dataset_type</strong> (<em>str</em>) – Type of data in the dataset e.g. text, audio etc.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dictionary with keys for ‘train’ and ‘test’ split, each of which holds a torch.utils.data.Dataset dataset</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="models.html" class="btn btn-neutral float-left" title="Models module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="data.html" class="btn btn-neutral float-right" title="Data module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Cai Davies.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

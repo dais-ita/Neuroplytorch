@@ -1,0 +1,83 @@
+DETAILS:
+  NAME: MNIST experiment
+  DISCRIPTION: Example of Neuroplytorch with MNIST dataset and arbitrary complex events for proof of concept
+
+TRAINING:
+  NUM_PRIMITIVE_EVENTS: 10
+  WINDOW_SIZE: 10
+  DATASET:
+    NAME: MNIST
+    TYPE: Pytorch Dataset
+    LOCATION: datasets/MNIST
+
+  REASONING:
+    LOSS_FUNCTION: MSELoss
+    LEARNING_RATE: 0.001 
+    EPOCHS: 1000
+    
+    PARAMETERS:
+      DATASET:
+        zero_windows: True
+        count_windows: False 
+        num_workers: 2
+        num_data: 1000000
+      MODEL:
+        hidden_size: 64
+        use_relu: False 
+
+
+  NEUROPLYTORCH: 
+    LEARNING_RATE: 0.001
+    LOSS_FUNCTION: MSELoss
+    EPOCHS: 300 
+    
+    PARAMETERS:
+      DATASET:
+        no_test: True
+        num_workers: 2
+        zero_windows:
+          train: True
+          val: True
+          test: True
+        count_windows:
+          train: False
+          val: False
+          test: False
+
+
+  PERCEPTION:
+    MODEL: LeNet
+    PRETRAIN:
+      MODEL_MODULE: MNISTModel
+      DATA_MODULE: MNISTDataModule
+      LOSS_FUNCTION: CrossEntropyLoss 
+      LEARNING_RATE: 0.001
+      PRETRAIN_PERCEPTION: True
+      PRETRAIN_EPOCHS: 3
+      
+    PARAMETERS: 
+      DATASET:
+        batch_size: 64 
+        num_workers: 2
+      MODEL:
+        input_size: 1
+
+
+COMPLEX EVENTS:
+  COMPLEX EVENT 1: 
+    PATTERN: [0,1,2]
+    EVENTS_BETWEEN: [0,0]
+    MAX_TIME: [INF, INF]
+  COMPLEX EVENT 2: 
+    PATTERN: [3,4,5]
+    EVENTS_BETWEEN: [0,0]
+    MAX_TIME: [INF, INF]
+  COMPLEX EVENT 3: 
+    PATTERN: [6,7,8]
+    EVENTS_BETWEEN: [0,0]
+    MAX_TIME: [INF, INF]
+  COMPLEX EVENT 4: 
+    PATTERN: [0,9]
+    EVENTS_BETWEEN: [0]
+    MAX_TIME: [INF]
+  

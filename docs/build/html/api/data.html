@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data module &mdash; Neuroplytorch 1.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Losses module" href="losses.html" />
+    <link rel="prev" title="Datasets module" href="datasets.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Neuroplytorch
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to Neuroplytorch’s documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../how_to.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="basic_models.html">Basic Models module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html">Models module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets.html">Datasets module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Data module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="losses.html">Losses module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parser.html">Parser module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Neuroplytorch</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">API documentation</a> &raquo;</li>
+      <li>Data module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/data.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="data-module">
+<span id="data-page"></span><h1>Data module<a class="headerlink" href="#data-module" title="Permalink to this headline"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="data.data.create_primitive_event">
+<span class="sig-prename descclassname"><span class="pre">data.data.</span></span><span class="sig-name descname"><span class="pre">create_primitive_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_primitive_events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selected_primitive_event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None._VariableFunctionsClass.tensor</span></span></span><a class="reference internal" href="../_modules/data/data.html#create_primitive_event"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.data.create_primitive_event" title="Permalink to this definition"></a></dt>
+<dd><p>Creates a primitive event vector, i.e. one_hot encoding of selected_primitive_event</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_primitive_events</strong> (<em>int</em>) – Number of primitive events, and so size of one hot vector</p></li>
+<li><p><strong>selected_primitive_event</strong> (<em>int</em>) – The selected primitive event, so the index of the one hot vector which is set to 1.0</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>One hot vector</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data.data.generate_primitive_event">
+<span class="sig-prename descclassname"><span class="pre">data.data.</span></span><span class="sig-name descname"><span class="pre">generate_primitive_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_primitive_events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None._VariableFunctionsClass.tensor</span></span></span><a class="reference internal" href="../_modules/data/data.html#generate_primitive_event"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.data.generate_primitive_event" title="Permalink to this definition"></a></dt>
+<dd><p>Creates a random primitive event</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>num_primitive_events</strong> (<em>int</em>) – Number of primitive events, and so size of one hot vector</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>One hot vector</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data.data.generate_window">
+<span class="sig-prename descclassname"><span class="pre">data.data.</span></span><span class="sig-name descname"><span class="pre">generate_window</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_primitive_events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None._VariableFunctionsClass.tensor</span></span></span><a class="reference internal" href="../_modules/data/data.html#generate_window"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.data.generate_window" title="Permalink to this definition"></a></dt>
+<dd><p>Create a window of random primitive events</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_primitive_events</strong> (<em>int</em>) – Number of primitive events, and so size of one hot vector</p></li>
+<li><p><strong>window_size</strong> (<em>int</em>) – Size of the window to be created</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Windowed primitive events, tensor of shape window_size x num_primitive_events</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data.data.window_to_simple_window">
+<span class="sig-prename descclassname"><span class="pre">data.data.</span></span><span class="sig-name descname"><span class="pre">window_to_simple_window</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None._VariableFunctionsClass.tensor</span></span></span><a class="reference internal" href="../_modules/data/data.html#window_to_simple_window"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.data.window_to_simple_window" title="Permalink to this definition"></a></dt>
+<dd><p>From a window of primitive events, return a window of the argmax for each primitive event, i.e. simple label.
+E.g. [0,0,0,1] return 3</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>window</strong> (<em>torch.tensor</em>) – Window of primitive events</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Tensor of shape window_size of simple labels</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data.data.check_pattern">
+<span class="sig-prename descclassname"><span class="pre">data.data.</span></span><span class="sig-name descname"><span class="pre">check_pattern</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_between_event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_events_between_events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="../_modules/data/data.html#check_pattern"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.data.check_pattern" title="Permalink to this definition"></a></dt>
+<dd><p>Given a window of primitive events and a single instance of the Neuroplytorch pattern parameters (event pattern, time between and event between)
+will return the number of times this particular complex event occurs in the window.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>window</strong> (<em>torch.tensor</em>) – Window of primitive events</p></li>
+<li><p><strong>pattern</strong> (<em>torch.tensor</em>) – The pattern of primitive events that make the complex event, where the final primitive event in the window has to match the final primitive event in this pattern</p></li>
+<li><p><strong>time_between_event</strong> (<em>torch.tensor</em>) – The maximum time allowed between each event in the pattern for the complex event to occur</p></li>
+<li><p><strong>num_events_between_events</strong> (<em>torch.tensor</em>) – The minimum number of events that need to occur between events in the pattern</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The number of instances of this complex event</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data.data._pattern_helper">
+<span class="sig-prename descclassname"><span class="pre">data.data.</span></span><span class="sig-name descname"><span class="pre">_pattern_helper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub_window</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sub_pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sub_num_events_between_events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="../_modules/data/data.html#_pattern_helper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.data._pattern_helper" title="Permalink to this definition"></a></dt>
+<dd><p>Helper function for check_pattern</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sub_window</strong> (<em>torch.tensor</em>) – Sublist of window</p></li>
+<li><p><strong>sub_pattern</strong> (<em>torch.tensor</em>) – Sublist of pattern</p></li>
+<li><p><strong>sub_num_events_between_events</strong> (<em>torch.tensor</em>) – Sublist of minimum events between events in pattern</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Number of instances of complex event occuring in window</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data.data.get_complex_label">
+<span class="sig-prename descclassname"><span class="pre">data.data.</span></span><span class="sig-name descname"><span class="pre">get_complex_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ce_fsm_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ce_time_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count_windows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None._VariableFunctionsClass.tensor</span></span></span><a class="reference internal" href="../_modules/data/data.html#get_complex_label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.data.get_complex_label" title="Permalink to this definition"></a></dt>
+<dd><p>Create a complex label by checking the Neuroplytorch pattern parameters for a given window.
+Complex label can be a count of complex events, or a boolean value if there is at least one instance</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>window</strong> (<em>torch.tensor</em>) – Window of primitive events</p></li>
+<li><p><strong>ce_fsm_list</strong> (<em>list</em>) – Pattern of events for each complex event</p></li>
+<li><p><strong>ce_time_list</strong> (<em>list</em>) – The temporal aspect of the complex event, i.e. maximum time between events in the pattern and  minimum number of events to occur between each event in the pattern. For each complex event</p></li>
+<li><p><strong>count_windows</strong> (<em>bool</em>) – Return a tensor of number of instances if True, else return boolean vector if complex event occurs at least once. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Complex label vector of shape number_of_complex_events</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data.data.complex_to_simple">
+<span class="sig-prename descclassname"><span class="pre">data.data.</span></span><span class="sig-name descname"><span class="pre">complex_to_simple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">complex_label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="../_modules/data/data.html#complex_to_simple"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.data.complex_to_simple" title="Permalink to this definition"></a></dt>
+<dd><p>One hot complex label to simple label (i.e. which complex event is occuring, including 0 as special case for no complex events).
+Only works for boolean-style complex labels where only one complex event is allowed to occur.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>complex_label</strong> (<em>torch.tensor</em>) – Complex label</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Complex event number (0 is no complex event)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data.data.check_complex_parameters">
+<span class="sig-prename descclassname"><span class="pre">data.data.</span></span><span class="sig-name descname"><span class="pre">check_complex_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ce_fsm_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ce_time_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/data.html#check_complex_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.data.check_complex_parameters" title="Permalink to this definition"></a></dt>
+<dd><p>Assert complex parameters are correct in size</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ce_fsm_list</strong> (<em>list</em>) – Pattern of events</p></li>
+<li><p><strong>ce_time_list</strong> (<em>list</em>) – Temporal metadata pattern</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if complex parameters are acceptable, else False</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="datasets.html" class="btn btn-neutral float-left" title="Datasets module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="losses.html" class="btn btn-neutral float-right" title="Losses module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Cai Davies.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

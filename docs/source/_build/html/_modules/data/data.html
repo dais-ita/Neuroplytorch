@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>data.data &mdash; Neuroplytorch 1.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Neuroplytorch
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Welcome to Neuroplytorch’s documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../how_to.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/index.html">API documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Neuroplytorch</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>data.data</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for data.data</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">torch</span> 
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
+<span class="kn">import</span> <span class="nn">torchvision</span>
+
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span> 
+<span class="kn">import</span> <span class="nn">random</span> 
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
+
+<span class="c1"># Data generation functions</span>
+
+<div class="viewcode-block" id="create_primitive_event"><a class="viewcode-back" href="../../api/data.html#data.data.create_primitive_event">[docs]</a><span class="k">def</span> <span class="nf">create_primitive_event</span><span class="p">(</span><span class="n">num_primitive_events</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">selected_primitive_event</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Creates a primitive event vector, i.e. one_hot encoding of selected_primitive_event</span>
+
+<span class="sd">    :param num_primitive_events: Number of primitive events, and so size of one hot vector</span>
+<span class="sd">    :type num_primitive_events: int</span>
+<span class="sd">    :param selected_primitive_event: The selected primitive event, so the index of the one hot vector which is set to 1.0</span>
+<span class="sd">    :type selected_primitive_event: int</span>
+
+<span class="sd">    :return: One hot vector</span>
+<span class="sd">    :rtype: torch.tensor</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">one_hot</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">selected_primitive_event</span><span class="p">]),</span> <span class="n">num_primitive_events</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="generate_primitive_event"><a class="viewcode-back" href="../../api/data.html#data.data.generate_primitive_event">[docs]</a><span class="k">def</span> <span class="nf">generate_primitive_event</span><span class="p">(</span><span class="n">num_primitive_events</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Creates a random primitive event</span>
+
+<span class="sd">    :param num_primitive_events: Number of primitive events, and so size of one hot vector</span>
+<span class="sd">    :type num_primitive_events: int</span>
+
+<span class="sd">    :return: One hot vector</span>
+<span class="sd">    :rtype: torch.tensor</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rand_primitive_event</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="o">*</span> <span class="n">num_primitive_events</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">one_hot</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">rand_primitive_event</span><span class="p">]),</span> <span class="n">num_primitive_events</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="generate_window"><a class="viewcode-back" href="../../api/data.html#data.data.generate_window">[docs]</a><span class="k">def</span> <span class="nf">generate_window</span><span class="p">(</span><span class="n">num_primitive_events</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">window_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Create a window of random primitive events </span>
+
+<span class="sd">    :param num_primitive_events: Number of primitive events, and so size of one hot vector</span>
+<span class="sd">    :type num_primitive_events: int</span>
+<span class="sd">    :param window_size: Size of the window to be created</span>
+<span class="sd">    :type window_size: int</span>
+
+<span class="sd">    :return: Windowed primitive events, tensor of shape window_size x num_primitive_events</span>
+<span class="sd">    :rtype: torch.tensor</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">window</span> <span class="o">=</span> <span class="p">[</span><span class="n">generate_primitive_event</span><span class="p">(</span><span class="n">num_primitive_events</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">window_size</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">window</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="window_to_simple_window"><a class="viewcode-back" href="../../api/data.html#data.data.window_to_simple_window">[docs]</a><span class="k">def</span> <span class="nf">window_to_simple_window</span><span class="p">(</span><span class="n">window</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; From a window of primitive events, return a window of the argmax for each primitive event, i.e. simple label.</span>
+<span class="sd">    E.g. [0,0,0,1] return 3</span>
+<span class="sd">    </span>
+<span class="sd">    :param window: Window of primitive events</span>
+<span class="sd">    :type window: torch.tensor</span>
+
+<span class="sd">    :return: Tensor of shape window_size of simple labels </span>
+<span class="sd">    :rtype: torch.tensor</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+ 
+<div class="viewcode-block" id="check_pattern"><a class="viewcode-back" href="../../api/data.html#data.data.check_pattern">[docs]</a><span class="k">def</span> <span class="nf">check_pattern</span><span class="p">(</span><span class="n">window</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">pattern</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">time_between_event</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">num_events_between_events</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Given a window of primitive events and a single instance of the Neuroplytorch pattern parameters (event pattern, time between and event between)</span>
+<span class="sd">    will return the number of times this particular complex event occurs in the window.</span>
+
+<span class="sd">    :param window: Window of primitive events</span>
+<span class="sd">    :type window: torch.tensor</span>
+<span class="sd">    :param pattern: The pattern of primitive events that make the complex event, where the final primitive event in the window has to match the final primitive event in this pattern</span>
+<span class="sd">    :type pattern: torch.tensor</span>
+<span class="sd">    :param time_between_event: The maximum time allowed between each event in the pattern for the complex event to occur</span>
+<span class="sd">    :type time_between_event: torch.tensor</span>
+<span class="sd">    :param num_events_between_events: The minimum number of events that need to occur between events in the pattern</span>
+<span class="sd">    :type num_events_between_events: torch.tensor</span>
+
+<span class="sd">    :return: The number of instances of this complex event </span>
+<span class="sd">    :rtype: int</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">simple_window</span> <span class="o">=</span> <span class="n">window_to_simple_window</span><span class="p">(</span><span class="n">window</span><span class="p">)</span> 
+
+    <span class="c1"># If last event in pattern doesn&#39;t match last event in window, immediate no complex events</span>
+    <span class="k">if</span> <span class="n">simple_window</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">!=</span><span class="n">pattern</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span> <span class="k">return</span> <span class="mi">0</span> 
+
+    <span class="c1"># Easier to work in reverse, so reverse the window and complex event parameters</span>
+    <span class="c1"># TODO: include max time between events</span>
+    <span class="n">simple_window</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">simple_window</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,))</span>
+    <span class="n">pattern</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,))</span>
+    <span class="n">num_events_between_events</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">num_events_between_events</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,))</span> 
+
+    <span class="c1"># number of events to skip due to the minimum number of events between events in the pattern </span>
+    <span class="n">sublist_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">num_events_between_events</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">())</span><span class="o">+</span><span class="mi">1</span>
+
+    <span class="c1"># create sublists of window and complex event parameters</span>
+    <span class="n">sublist_window</span> <span class="o">=</span> <span class="n">simple_window</span><span class="p">[</span><span class="n">sublist_index</span><span class="p">:]</span>
+    <span class="n">sublist_pattern</span> <span class="o">=</span> <span class="n">pattern</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="n">sublist_num_events_between_events</span> <span class="o">=</span> <span class="n">num_events_between_events</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+
+    <span class="c1"># return number of instances of this complex event </span>
+    <span class="k">return</span> <span class="mi">0</span> <span class="o">+</span> <span class="n">_pattern_helper</span><span class="p">(</span><span class="n">sublist_window</span><span class="p">,</span> <span class="n">sublist_pattern</span><span class="p">,</span> <span class="n">sublist_num_events_between_events</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="_pattern_helper"><a class="viewcode-back" href="../../api/data.html#data.data._pattern_helper">[docs]</a><span class="k">def</span> <span class="nf">_pattern_helper</span><span class="p">(</span><span class="n">sub_window</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">sub_pattern</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">sub_num_events_between_events</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Helper function for check_pattern </span>
+
+<span class="sd">    :param sub_window: Sublist of window</span>
+<span class="sd">    :type sub_window: torch.tensor</span>
+<span class="sd">    :param sub_pattern: Sublist of pattern</span>
+<span class="sd">    :type sub_pattern: torch.tensor</span>
+<span class="sd">    :param sub_num_events_between_events: Sublist of minimum events between events in pattern </span>
+<span class="sd">    :type sub_num_events_between_events: torch.tensor</span>
+
+<span class="sd">    :return: Number of instances of complex event occuring in window </span>
+<span class="sd">    :rtype: int</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># If recursived through the whole list of minimum events between events in pattern </span>
+    <span class="k">if</span> <span class="n">sub_num_events_between_events</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span> 
+        <span class="c1"># return the number of instances of the last event in the pattern </span>
+        <span class="n">indices_first_pattern</span> <span class="o">=</span> <span class="p">(</span><span class="n">sub_window</span> <span class="o">==</span> <span class="n">sub_pattern</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">nonzero</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">indices_first_pattern</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># get the indices of the next event in the pattern (can be multiple)</span>
+        <span class="n">indices_first_pattern</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">sub_window</span> <span class="o">==</span> <span class="n">sub_pattern</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(),</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">))</span>
+        <span class="c1"># if this event isn&#39;t in the window, return 0 </span>
+        <span class="k">if</span> <span class="n">indices_first_pattern</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span> <span class="k">return</span> <span class="mi">0</span>
+        
+        <span class="c1"># for each occurrence of this event in the window, recursively check the new sub lists </span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices_first_pattern</span><span class="p">:</span>
+            <span class="c1"># number of events to skip due to the minimum number of events between events in the pattern </span>
+            <span class="n">sublist_index</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">sub_num_events_between_events</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">())</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="c1"># check new sub list</span>
+            <span class="n">total</span> <span class="o">+=</span> <span class="n">_pattern_helper</span><span class="p">(</span><span class="n">sub_window</span><span class="p">[</span><span class="n">sublist_index</span><span class="p">:],</span> <span class="n">sub_pattern</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">sub_num_events_between_events</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+
+    <span class="k">return</span> <span class="n">total</span></div>
+
+
+<div class="viewcode-block" id="get_complex_label"><a class="viewcode-back" href="../../api/data.html#data.data.get_complex_label">[docs]</a><span class="k">def</span> <span class="nf">get_complex_label</span><span class="p">(</span><span class="n">window</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span> <span class="n">ce_fsm_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">ce_time_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">count_windows</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Create a complex label by checking the Neuroplytorch pattern parameters for a given window.</span>
+<span class="sd">    Complex label can be a count of complex events, or a boolean value if there is at least one instance</span>
+
+<span class="sd">    :param window: Window of primitive events</span>
+<span class="sd">    :type window: torch.tensor</span>
+<span class="sd">    :param ce_fsm_list: Pattern of events for each complex event</span>
+<span class="sd">    :type ce_fsm_list: list</span>
+<span class="sd">    :param ce_time_list: The temporal aspect of the complex event, i.e. maximum time between events in the pattern and  minimum number of events to occur between each event in the pattern. For each complex event</span>
+<span class="sd">    :type ce_time_list: list</span>
+<span class="sd">    :param count_windows: Return a tensor of number of instances if True, else return boolean vector if complex event occurs at least once. Defaults to False.</span>
+<span class="sd">    :type count_windows: bool</span>
+<span class="sd">    </span>
+<span class="sd">    :return: Complex label vector of shape number_of_complex_events</span>
+<span class="sd">    :rtype: torch.tensor</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">label</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ce_fsm_list</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">timings</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">ce_fsm_list</span><span class="p">,</span> <span class="n">ce_time_list</span><span class="p">)):</span>
+        <span class="n">holds_pattern</span> <span class="o">=</span> <span class="n">check_pattern</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">pattern</span><span class="p">,</span> <span class="n">timings</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">timings</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">holds_pattern</span><span class="p">:</span> <span class="n">label</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">holds_pattern</span>
+    
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">count_windows</span><span class="p">:</span> <span class="n">label</span> <span class="o">=</span> <span class="n">label</span><span class="o">.</span><span class="n">bool</span><span class="p">()</span><span class="o">.</span><span class="n">float</span><span class="p">()</span> 
+    <span class="k">return</span> <span class="n">label</span></div>
+
+
+<div class="viewcode-block" id="complex_to_simple"><a class="viewcode-back" href="../../api/data.html#data.data.complex_to_simple">[docs]</a><span class="k">def</span> <span class="nf">complex_to_simple</span><span class="p">(</span><span class="n">complex_label</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; One hot complex label to simple label (i.e. which complex event is occuring, including 0 as special case for no complex events).</span>
+<span class="sd">    Only works for boolean-style complex labels where only one complex event is allowed to occur.</span>
+
+<span class="sd">    :param complex_label: Complex label</span>
+<span class="sd">    :type complex_label: torch.tensor</span>
+
+<span class="sd">    :return: Complex event number (0 is no complex event)</span>
+<span class="sd">    :rtype: int</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">complex_label</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span> <span class="k">else</span> <span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">complex_label</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="o">+</span><span class="mi">1</span></div>
+
+
+<div class="viewcode-block" id="check_complex_parameters"><a class="viewcode-back" href="../../api/data.html#data.data.check_complex_parameters">[docs]</a><span class="k">def</span> <span class="nf">check_complex_parameters</span><span class="p">(</span><span class="n">ce_fsm_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">ce_time_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Assert complex parameters are correct in size</span>
+
+<span class="sd">    :param ce_fsm_list: Pattern of events</span>
+<span class="sd">    :type ce_fsm_list: list</span>
+<span class="sd">    :param ce_time_list: Temporal metadata pattern </span>
+<span class="sd">    :type ce_time_list: list</span>
+
+<span class="sd">    :return: True if complex parameters are acceptable, else False</span>
+<span class="sd">    :rtype: bool</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ce_fsm_list</span><span class="p">)</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">ce_time_list</span><span class="p">):</span> <span class="k">return</span> <span class="kc">False</span> 
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ce_fsm_list</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">ce_fsm_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">!=</span> <span class="p">(</span><span class="n">ce_time_list</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span> <span class="k">return</span> <span class="kc">False</span> 
+        <span class="c1">#if (ce_time_list[i][0].shape[0]!=ce_time_list[i][1].shape[0]): return False</span>
+    
+    <span class="k">return</span> <span class="kc">True</span> </div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Cai Davies.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

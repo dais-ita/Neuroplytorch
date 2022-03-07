@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Getting Started &mdash; Neuroplytorch 1.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API documentation" href="api/index.html" />
+    <link rel="prev" title="Welcome to Neuroplytorch’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> Neuroplytorch
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Welcome to Neuroplytorch’s documentation!</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#running-neuroplytorch">Running Neuroplytorch</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#example-terminal-execution">Example terminal execution</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#config-files">Config files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#config-file-structure">Config file structure</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#details">Details</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#training">Training</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reasoning">Reasoning</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#neuroplytorch">Neuroplytorch</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#perception">Perception</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#complex-events">Complex events</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#adding-your-own-dataset">Adding your own dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#implementing-new-models">Implementing new models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pretraining-the-perception-layer">Pretraining the perception layer</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">API documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Neuroplytorch</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Getting Started</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/how_to.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="getting-started">
+<span id="how-to-page"></span><h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline"></a></h1>
+<p>This page will introduce you to the Neuroplytorch framework, and will show how to run, how to create new scenarios and introduce new datasets, as well as
+how to implement new neural network architectures for the perception layer. This framework is a Pytorch implementation of <a class="reference external" href="https://github.com/nesl/Neuroplex">https://github.com/nesl/Neuroplex</a>
+with additions for general use across multiple scenarios, datasets and perception layer models.</p>
+<section id="running-neuroplytorch">
+<h2>Running Neuroplytorch<a class="headerlink" href="#running-neuroplytorch" title="Permalink to this headline"></a></h2>
+<p>The Neuroplytorch framework can be run in one of three ways:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Reasoning model training followed by end-to-end training</p></li>
+<li><p>End-to-end training</p></li>
+<li><p>Reasoning model logic check</p></li>
+</ul>
+</div></blockquote>
+<p>The first two in this list depend on whether a reasoning model has already been trained, which is saved to the models/ directory, i.e. a reasoning model
+will be loaded and training skipped if there is a reasoning model to be found, else it will be trained from scratch and saved for future runs. The logic
+check is run if the --logic flag is given as a program argument, and will entirely skip any training and simply check the logic of the saved reasoning
+model.</p>
+<p>WARNING: The logic check goes through every possible permutation of windowed simple events, and will take a long time to run fully, although it’s possible
+to run for a short while to somewhat ensure the logic is decently sound, as the function will break early if any input breaks the logic.</p>
+<p>To run the framework, use the following command in a terminal of your choice:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">python main.py</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt>Arguments:</dt><dd><ul class="simple">
+<li><p>--name: str, Name of the file in configs/ directory to use, as well as the name of the models saved. Defaults to basic_neuro_experiment.</p></li>
+<li><p>--logic: int, If 1 then check the logic of the loaded Reasoning model, else run end-to-end training. Defaults to 0</p></li>
+</ul>
+</dd>
+</dl>
+<section id="example-terminal-execution">
+<h3>Example terminal execution<a class="headerlink" href="#example-terminal-execution" title="Permalink to this headline"></a></h3>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">python main.py --name basic_neuro_experiment --logic 0</span>
+</pre></div>
+</div>
+<p>This will read from the file configs/basic_neuro_experiment.yaml and run end-to-end training. It will train a reasoning model if one hasn’t been trained already.
+With a trained reasoning layer, the argument --logic 0 will ignore end-to-end training and will check the logic of the newly trained reasoning layer (see warning).</p>
+</section>
+</section>
+<section id="config-files">
+<h2>Config files<a class="headerlink" href="#config-files" title="Permalink to this headline"></a></h2>
+<p>Config files in the YAML format are stored in the configs/ directory, and are used to separate experiments/scenarios/runs and provide hyperparameters for each.
+As mentioned above, the --name flag will point to the name of the config file to run. The config file is the centrepiece to define not only the hyperparameters for
+training, but also the dataset and neural network architectures to use, so for example one config file may define the dataset as a stream from a security camera, with
+an object detection model for the perception layer, another may point to audio data and a VGGish model.</p>
+<p>The config file is logged to Tensorboard for each run, so alterations between experiments can then be compared. Future work may include introducing libraries such as
+Optuna for hyperparameter search.</p>
+<section id="config-file-structure">
+<h3>Config file structure<a class="headerlink" href="#config-file-structure" title="Permalink to this headline"></a></h3>
+<p>An example config file can be found in configs/example.yaml, which defines the MNIST problem with arbitrary complex events. The basic structure of the file can be seen below,
+with a more detailed explanation following. Note that the config file is parsed into a Python dict object, and so some of the keys shown here can be omitted if not needed,
+while others must be included; to show this, keys with a * can be omitted if they are not needed for particular experiment (as can the sub keys that follow). Each leaf node
+will have a value rather than continue the tree, which could be a numerical value, a string, list etc. which is defined in the detailed explanation.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>.
+├── DETAILS
+│   ├── NAME
+│   ├── DESCRIPTION
+├── TRAINING
+│   ├── NUM_PRIMITIVE_EVENTS
+│   ├── WINDOW_SIZE
+│   ├── DATASET
+│       ├── NAME
+│       ├── TYPE
+│       ├── LOCATION
+│   ├── REASONING
+│       ├── LOSS_FUNCTION*
+│       ├── LEARNING_RATE*
+│       ├── EPOCHS
+│       ├── PARAMETERS*
+│           ├── DATASET
+│           ├── MODEL
+│   ├── NEUROPLYTORCH
+│       ├── LEARNING_RATE*
+│       ├── LOSS_FUNCTION*
+│       ├── EPOCHS
+│       ├── PARAMETERS*
+│           ├── DATASET
+│           ├── MODEL
+│   ├── PERCEPTION
+│       ├── MODEL
+│       ├── PRETRAIN*
+│           ├── MODEL_MODULE
+│           ├── DATA_MODULE
+│           ├── LOSS_FUNCTION
+│           ├── LEARNING_RATE
+│           ├── PRETRAIN_PERCEPTION
+│           ├── PRETRAIN_EPOCHS
+│           ├── PARAMETERS
+│               ├── DATASET
+│               ├── MODEL
+├── COMPLEX EVENTS
+│   ├── COMPLEX_EVENT_NAME
+│       ├── PATTERN
+│       ├── EVENTS_BETWEEN
+│       ├── MAX_TIME
+│   ├── COMPLEX_EVENT_NAME
+│       ├── PATTERN
+│       ├── EVENTS_BETWEEN
+│       ├── MAX_TIME
+    .
+    .
+    .
+</pre></div>
+</div>
+<section id="details">
+<h4>Details<a class="headerlink" href="#details" title="Permalink to this headline"></a></h4>
+<p>Here is simply a place to define the name and details of the experiment, and is simply for the use of elaboration on the experiment, e.g. what the scenario is, what the complex events are looking for etc.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>NAME: The name of the experiment. (text)</p></li>
+<li><p>DESCRIPTION: Description of the experiment. (text)</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="training">
+<h4>Training<a class="headerlink" href="#training" title="Permalink to this headline"></a></h4>
+<p>Here is where the hyperparameters for training models (reasoning, end-to-end and pretraining perception) is defined, and the following subheadings (Reasoning, Neuroplytorch, Perception) are child nodes of
+this key.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>NUM_PRIMITIVE_EVENTS: The number of possible primitive/simple events that can be classified by the perception layer, e.g. would be 10 for MNIST as there are 10 possible classes that can be
+predicted. (int)</p></li>
+<li><p>WINDOW_SIZE: The size of the window to inference over using the perception layer, and so defines the window size for the reasoning model. Experiments show that this value must be at least 10.
+[TODO]: add further information on window size. (int)</p></li>
+<li><p>DATASET: Defines hyperparameters for the raw input dataset:</p>
+<ul>
+<li><p>NAME:</p></li>
+</ul>
+</li>
+</ul>
+</div></blockquote>
+</section>
+<section id="reasoning">
+<h4>Reasoning<a class="headerlink" href="#reasoning" title="Permalink to this headline"></a></h4>
+</section>
+<section id="neuroplytorch">
+<h4>Neuroplytorch<a class="headerlink" href="#neuroplytorch" title="Permalink to this headline"></a></h4>
+</section>
+<section id="perception">
+<h4>Perception<a class="headerlink" href="#perception" title="Permalink to this headline"></a></h4>
+</section>
+<section id="complex-events">
+<h4>Complex events<a class="headerlink" href="#complex-events" title="Permalink to this headline"></a></h4>
+</section>
+</section>
+</section>
+<section id="adding-your-own-dataset">
+<h2>Adding your own dataset<a class="headerlink" href="#adding-your-own-dataset" title="Permalink to this headline"></a></h2>
+</section>
+<section id="implementing-new-models">
+<h2>Implementing new models<a class="headerlink" href="#implementing-new-models" title="Permalink to this headline"></a></h2>
+</section>
+<section id="pretraining-the-perception-layer">
+<h2>Pretraining the perception layer<a class="headerlink" href="#pretraining-the-perception-layer" title="Permalink to this headline"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to Neuroplytorch’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api/index.html" class="btn btn-neutral float-right" title="API documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Cai Davies.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>data.datasets &mdash; Neuroplytorch 1.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Neuroplytorch
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Welcome to Neuroplytorch’s documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../how_to.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/index.html">API documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Neuroplytorch</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>data.datasets</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for data.datasets</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data.dataset</span> <span class="kn">import</span> <span class="n">random_split</span> 
+<span class="kn">import</span> <span class="nn">torchvision</span>
+<span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">transforms</span>
+<span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">datasets</span> <span class="k">as</span> <span class="n">tvdatasets</span>
+<span class="kn">import</span> <span class="nn">pytorch_lightning</span> <span class="k">as</span> <span class="nn">pl</span> 
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span> 
+<span class="kn">import</span> <span class="nn">os</span> 
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span> 
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span> 
+<span class="kn">import</span> <span class="nn">random</span> 
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+
+<span class="kn">from</span> <span class="nn">data</span> <span class="kn">import</span> <span class="n">data</span><span class="p">,</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">parser</span>
+
+<div class="viewcode-block" id="BasicDataset"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.BasicDataset">[docs]</a><span class="k">class</span> <span class="nc">BasicDataset</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Basic Pytorch dataset, where data is held in &#39;x&#39; and labels held in &#39;label&#39;</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="BasicDataset.__init__"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.BasicDataset.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Pass through data, labels and intermediate labels</span>
+
+<span class="sd">        :param x: Data</span>
+<span class="sd">        :type x: iterable</span>
+<span class="sd">        :param labels: Labels. Defaults to None.</span>
+<span class="sd">        :type labels: iterable, optional</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span></div>
+
+<div class="viewcode-block" id="BasicDataset.__getitem__"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.BasicDataset.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Return dict of next item x and label </span>
+
+<span class="sd">        :param idx: Index</span>
+<span class="sd">        :type idx: int</span>
+
+<span class="sd">        :return: Dict with keys: x, label for data and label </span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">idx</span><span class="p">]}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="BasicDataset.__len__"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.BasicDataset.__len__">[docs]</a>    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Get length of dataset</span>
+
+<span class="sd">        :return: Length of dataset </span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span></div></div>
+
+<span class="k">class</span> <span class="nc">BasicDatasetDict</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Basic Pytorch dataset, where data is held in &#39;x&#39; and labels held in &#39;label&#39;</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Pass through data, labels and intermediate labels</span>
+
+<span class="sd">        :param x: Data</span>
+<span class="sd">        :type x: iterable</span>
+<span class="sd">        :param labels: Labels. Defaults to None.</span>
+<span class="sd">        :type labels: iterable, optional</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Return dict of next item x and label </span>
+
+<span class="sd">        :param idx: Index</span>
+<span class="sd">        :type idx: int</span>
+
+<span class="sd">        :return: Dict with keys: x, label for data and label </span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">idx</span><span class="p">]}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">item</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Get length of dataset</span>
+
+<span class="sd">        :return: Length of dataset </span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+
+<div class="viewcode-block" id="EndEndDataset"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.EndEndDataset">[docs]</a><span class="k">class</span> <span class="nc">EndEndDataset</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Dataset for end-to-end Neuroplytorch training, which has labels and intermediate labels, i.e. the labels for the perception model.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="EndEndDataset.__init__"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.EndEndDataset.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">labels_intermediate</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Pass through data, labels and intermediate labels</span>
+
+<span class="sd">        :param x: Data</span>
+<span class="sd">        :type x: iterable</span>
+<span class="sd">        :param labels: Labels. Defaults to None.</span>
+<span class="sd">        :type labels: iterable, optional</span>
+<span class="sd">        :param labels_intermediate: Intermediate (perception model) labels. Defaults to None.</span>
+<span class="sd">        :type labels_intermediate: iterable, optional</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels_intermediate</span> <span class="o">=</span> <span class="n">labels_intermediate</span></div>
+
+<div class="viewcode-block" id="EndEndDataset.__getitem__"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.EndEndDataset.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Return dict of next item x, label and intermediate label</span>
+
+<span class="sd">        :param idx: Index</span>
+<span class="sd">        :type idx: int</span>
+
+<span class="sd">        :return: Dict with keys: x, label, label_intermediate for data, label and intermediate label</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">idx</span><span class="p">]}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels_intermediate</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;label_intermediate&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels_intermediate</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">item</span></div>
+
+<div class="viewcode-block" id="EndEndDataset.__len__"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.EndEndDataset.__len__">[docs]</a>    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Get length of dataset</span>
+
+<span class="sd">        :return: Length of dataset </span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="ReasoningDataModule"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.ReasoningDataModule">[docs]</a><span class="k">class</span> <span class="nc">ReasoningDataModule</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningDataModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Pytorch lightning data module for reasoning model training. Will create a synthetic dataset from given parameters to train the reasoning</span>
+<span class="sd">    model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="ReasoningDataModule.__init__"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.ReasoningDataModule.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ce_fsm_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">ce_time_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">num_primitive_events</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">window_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">zero_windows</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> 
+                <span class="n">count_windows</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">num_data</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000000</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span>
+                <span class="n">val_split</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">test_split</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="mf">0.2</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Init function for ReasoningDataModule</span>
+
+<span class="sd">        :param ce_fsm_list: Pattern of primitive events for each complex event.</span>
+<span class="sd">        :type ce_fsm_list: list</span>
+<span class="sd">        :param ce_time_list: Temporal metadata pattern for each complex event</span>
+<span class="sd">        :type ce_time_list: list</span>
+<span class="sd">        :param num_primitive_events: Number of primitive events i.e. size of one hot primitive event vectors.</span>
+<span class="sd">        :type num_primitive_events: int</span>
+<span class="sd">        :param window_size: Size of the window of primitive events. </span>
+<span class="sd">        :type window_size: int</span>
+<span class="sd">        :param zero_windows: Include windows that have no complex events if True. Defaults to False.</span>
+<span class="sd">        :type zero_windows: bool, optional</span>
+<span class="sd">        :param count_windows: Complex label is a count of complex events if True, otherwise a boolean vector where a complex event is 1 if there is at least one instance of that complex event. Defaults to False.</span>
+<span class="sd">        :type count_windows: bool. optional</span>
+<span class="sd">        :param num_data: Number of data items to generate. Defaults to 1000000.</span>
+<span class="sd">        :type num_data: int, optional</span>
+<span class="sd">        :param batch_size: Batch size of dataset loader. Defaults to 256.</span>
+<span class="sd">        :type batch_size: int, optional</span>
+<span class="sd">        :param num_workers: Number of CPU cores to load data. Defaults to int(os.cpu_count()/2).</span>
+<span class="sd">        :type num_workers: int, optional</span>
+<span class="sd">        :param val_split: Train-Validation split. Defaults to 0.2.</span>
+<span class="sd">        :type val_split: float, optional</span>
+<span class="sd">        :param test_split: Train/Validation-Test split. Defaults to 0.2.</span>
+<span class="sd">        :type test_split: float, optional</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span> <span class="o">=</span> <span class="n">num_workers</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">val_split</span> <span class="o">=</span> <span class="n">val_split</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_split</span> <span class="o">=</span> <span class="n">test_split</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ce_fsm_list</span> <span class="o">=</span> <span class="n">ce_fsm_list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ce_time_list</span> <span class="o">=</span> <span class="n">ce_time_list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_primitive_events</span> <span class="o">=</span> <span class="n">num_primitive_events</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span> <span class="o">=</span> <span class="n">window_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">zero_windows</span> <span class="o">=</span> <span class="n">zero_windows</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">count_windows</span> <span class="o">=</span> <span class="n">count_windows</span>
+        <span class="c1">#self.balance_labels = balance_labels </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_data</span> <span class="o">=</span> <span class="n">num_data</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dl_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;batch_size&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="s1">&#39;num_workers&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span><span class="p">,</span> <span class="s1">&#39;shuffle&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;persistent_workers&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span></div>
+
+    <span class="c1"># TODO: balance labels or not?</span>
+<div class="viewcode-block" id="ReasoningDataModule.prepare_data"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.ReasoningDataModule.prepare_data">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Generate windowed primitive events and complex labels for reasoning model training</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">reasoning_windows</span><span class="p">,</span> <span class="n">reasoning_labels</span><span class="p">,</span> <span class="n">reasoning_labels_count</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+
+        <span class="c1"># TODO: how to remove duplicates? - could throw the balance off potentially?</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_data</span><span class="p">),</span> <span class="n">total</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_data</span><span class="p">):</span>
+            <span class="n">w</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">generate_window</span><span class="p">(</span><span class="n">num_primitive_events</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_primitive_events</span><span class="p">,</span> <span class="n">window_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">)</span>
+            <span class="n">l</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_complex_label</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="n">w</span><span class="p">,</span> <span class="n">ce_fsm_list</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ce_fsm_list</span><span class="p">,</span> <span class="n">ce_time_list</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ce_time_list</span><span class="p">,</span> <span class="n">count_windows</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">count_windows</span><span class="p">)</span> 
+
+            <span class="c1"># if using boolean complex labels, make sure no element is &gt;1</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">count_windows</span> <span class="ow">and</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">l</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="c1"># if not using no-complex-event windows and window is labelled no-complex-event</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">zero_windows</span> <span class="ow">and</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">l</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span> <span class="k">continue</span>
+
+            <span class="n">reasoning_windows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+            <span class="n">reasoning_labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+            <span class="n">reasoning_labels_count</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">l</span><span class="o">.</span><span class="n">tolist</span><span class="p">()))</span> <span class="c1"># used to count labels</span>
+            
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Number of primitive event windows </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">reasoning_labels</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_counter</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">reasoning_labels_count</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Label balance&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_counter</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">reasoning_windows</span> <span class="o">=</span> <span class="n">reasoning_windows</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reasoning_labels</span> <span class="o">=</span> <span class="n">reasoning_labels</span></div>
+
+<div class="viewcode-block" id="ReasoningDataModule.setup"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.ReasoningDataModule.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Preprocess data depending on the stage (fit or test)</span>
+
+<span class="sd">        :param stage: String denoting the stage needed i.e. fit or test. Defaults to None, which is equivalent to fit.</span>
+<span class="sd">        :type stage: str, optional </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">train_test_split</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reasoning_labels</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">test_split</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit_windows</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reasoning_windows</span><span class="p">[:</span><span class="n">train_test_split</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">reasoning_labels</span><span class="p">[:</span><span class="n">train_test_split</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_windows</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reasoning_windows</span><span class="p">[</span><span class="n">train_test_split</span><span class="p">:],</span> <span class="bp">self</span><span class="o">.</span><span class="n">reasoning_labels</span><span class="p">[</span><span class="n">train_test_split</span><span class="p">:]</span>
+
+        <span class="k">if</span> <span class="n">stage</span> <span class="o">==</span> <span class="s1">&#39;fit&#39;</span> <span class="ow">or</span> <span class="n">stage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">train_val_split</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fit_windows</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">val_split</span><span class="p">))</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">train_windows</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_windows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_windows</span><span class="p">[:</span><span class="n">train_val_split</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_windows</span><span class="p">[</span><span class="n">train_val_split</span><span class="p">:]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">train_labels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_labels</span><span class="p">[:</span><span class="n">train_val_split</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_labels</span><span class="p">[</span><span class="n">train_val_split</span><span class="p">:]</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span> <span class="o">=</span> <span class="n">BasicDatasetDict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_windows</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_labels</span><span class="p">)</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">train_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">dl_dict</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">val_dataset</span> <span class="o">=</span> <span class="n">BasicDatasetDict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_windows</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_labels</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">val_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_dataset</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">dl_dict</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">stage</span> <span class="o">==</span> <span class="s1">&#39;test&#39;</span> <span class="ow">or</span> <span class="n">stage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">test_dataset</span> <span class="o">=</span> <span class="n">BasicDatasetDict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_windows</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_labels</span><span class="p">)</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">test_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_dataset</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">dl_dict</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="ReasoningDataModule.train_dataloader"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.ReasoningDataModule.train_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot; Return Pytorch DataLoader for train dataset </span>
+
+<span class="sd">        :rtype: torch.utils.data.DataLoader</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_loader</span></div>
+<div class="viewcode-block" id="ReasoningDataModule.val_dataloader"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.ReasoningDataModule.val_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">val_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot; Return Pytorch DataLoader for validation dataset </span>
+
+<span class="sd">        :rtype: torch.utils.data.DataLoader</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_loader</span> </div>
+<div class="viewcode-block" id="ReasoningDataModule.test_dataloader"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.ReasoningDataModule.test_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">test_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot; Return Pytorch DataLoader for test dataset </span>
+
+<span class="sd">        :rtype: torch.utils.data.DataLoader</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_loader</span></div></div>
+
+<div class="viewcode-block" id="PerceptionWindowDataModule"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.PerceptionWindowDataModule">[docs]</a><span class="k">class</span> <span class="nc">PerceptionWindowDataModule</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningDataModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Dataset for training a perception model using windowed data. Useful for training a perception model similarly to end-to-end</span>
+<span class="sd">    training but using the intermediate labels to calculate loss </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="PerceptionWindowDataModule.__init__"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.PerceptionWindowDataModule.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">num_primitive_events</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">window_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span>
+                <span class="n">val_split</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">test_split</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="mf">0.2</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; </span>
+
+<span class="sd">        :param dataset: Tuple with keys &#39;train&#39; and &#39;test&#39;, each of which holds a dataset (train and test set respectively). The dataset must be in a format that is iterable, where it can be iterated as data,label pairs. For example, can be a list of tuples, or a Pytorch dataset.</span>
+<span class="sd">        :type dataset: tuple</span>
+<span class="sd">        :param num_primitive_events: Number of primitive events i.e. size of one hot primitive event vectors.</span>
+<span class="sd">        :type num_primitive_events: int</span>
+<span class="sd">        :param window_size: Size of the window of primitive events.</span>
+<span class="sd">        :type window_size: int</span>
+<span class="sd">        :param batch_size: Batch size of dataset loader. Defaults to 256.</span>
+<span class="sd">        :type batch_size: int </span>
+<span class="sd">        :param num_workers: Number of CPU cores to load data. Defaults to int(os.cpu_count()/2).</span>
+<span class="sd">        :type num_workers: int, optional</span>
+<span class="sd">        :param val_split: Train-Validation split. Defaults to 0.2.</span>
+<span class="sd">        :type val_split: float, optional</span>
+<span class="sd">        :param test_split: Train/Validation-Test split. Defaults to 0.2.</span>
+<span class="sd">        :type test_split: float, optional</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span> <span class="o">=</span> <span class="n">num_workers</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">val_split</span> <span class="o">=</span> <span class="n">val_split</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_split</span> <span class="o">=</span> <span class="n">test_split</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span> <span class="o">=</span> <span class="n">window_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_primitive_events</span> <span class="o">=</span> <span class="n">num_primitive_events</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dl_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;batch_size&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="s1">&#39;num_workers&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span><span class="p">,</span> <span class="s1">&#39;shuffle&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;persistent_workers&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="PerceptionWindowDataModule.prepare_data"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.PerceptionWindowDataModule.prepare_data">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Generate windowed raw input data for training a perception model using windowed data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Preparing dataset&quot;</span><span class="p">)</span>
+        <span class="c1"># for train and test set </span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">,</span> <span class="s1">&#39;test&#39;</span><span class="p">]:</span>
+            <span class="n">all_data</span> <span class="o">=</span> <span class="p">[]</span> 
+            
+            <span class="c1"># from Pytorch Dataset to list </span>
+            <span class="k">for</span> <span class="n">xx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="n">t</span><span class="p">]:</span> <span class="n">all_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xx</span><span class="p">)</span>
+            <span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">all_data</span><span class="p">)</span> 
+
+            <span class="c1"># split data and labels</span>
+            <span class="n">datas</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">xx</span> <span class="ow">in</span> <span class="n">all_data</span><span class="p">:</span> 
+                <span class="n">datas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xx</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> 
+                <span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xx</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">xx</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="c1"># rolling window sampling with size window_size and stride=1</span>
+            <span class="n">image_windows</span><span class="p">,</span> <span class="n">label_windows</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span> 
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">datas</span><span class="p">)</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">),</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">):</span>
+                <span class="n">image_windows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">datas</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">]))</span>
+                <span class="n">label_windows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">data</span><span class="o">.</span><span class="n">create_primitive_event</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_primitive_events</span><span class="p">,</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">]]))</span>
+            
+            <span class="c1"># if preparing train set</span>
+            <span class="k">if</span> <span class="n">t</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">image_windows</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">image_windows</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">label_windows</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">label_windows</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span> 
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">image_windows_test</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">image_windows</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">label_windows_test</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">label_windows</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="PerceptionWindowDataModule.setup"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.PerceptionWindowDataModule.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Preprocess data depending on the stage (fit or test)</span>
+
+<span class="sd">        :param stage: String denoting the stage needed i.e. fit or test. Defaults to None, which is equivalent to fit.</span>
+<span class="sd">        :type stage: str, optional </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">stage</span> <span class="o">==</span> <span class="s1">&#39;fit&#39;</span> <span class="ow">or</span> <span class="n">stage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">train_val_split</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_windows</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">val_split</span><span class="p">))</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">train_windows</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_windows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_windows</span><span class="p">[:</span><span class="n">train_val_split</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_windows</span><span class="p">[</span><span class="n">train_val_split</span><span class="p">:]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">train_labels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_windows</span><span class="p">[:</span><span class="n">train_val_split</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_windows</span><span class="p">[</span><span class="n">train_val_split</span><span class="p">:]</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span> <span class="o">=</span> <span class="n">BasicDatasetDict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_windows</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_labels</span><span class="p">)</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">train_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">dl_dict</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">val_dataset</span> <span class="o">=</span> <span class="n">BasicDatasetDict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_windows</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_labels</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">val_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_dataset</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">dl_dict</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">stage</span> <span class="o">==</span> <span class="s1">&#39;test&#39;</span> <span class="ow">or</span> <span class="n">stage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">test_dataset</span> <span class="o">=</span> <span class="n">BasicDatasetDict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_windows_test</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_windows_test</span><span class="p">)</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">test_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_dataset</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">dl_dict</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="PerceptionWindowDataModule.train_dataloader"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.PerceptionWindowDataModule.train_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot; Return Pytorch DataLoader for train dataset </span>
+
+<span class="sd">        :rtype: torch.utils.data.DataLoader</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_loader</span></div>
+<div class="viewcode-block" id="PerceptionWindowDataModule.val_dataloader"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.PerceptionWindowDataModule.val_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">val_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot; Return Pytorch DataLoader for validation dataset </span>
+
+<span class="sd">        :rtype: torch.utils.data.DataLoader</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_loader</span> </div>
+<div class="viewcode-block" id="PerceptionWindowDataModule.test_dataloader"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.PerceptionWindowDataModule.test_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">test_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot; Return Pytorch DataLoader for test dataset </span>
+
+<span class="sd">        :rtype: torch.utils.data.DataLoader</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_loader</span></div></div>
+    
+<div class="viewcode-block" id="EndToEndDataModule"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.EndToEndDataModule">[docs]</a><span class="k">class</span> <span class="nc">EndToEndDataModule</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningDataModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Pytorch Lightning data module to create the end-to-end training dataset for Neuroplytorch. Given a raw input dataset (e.g. MNIST) and the complex event parameters (patterns and metadata),</span>
+<span class="sd">    this will preprocess the data to create the windowed data and necessary labels for end-to-end training. Especially useful in conjunction with the Pytorch Lightning Neuroplytorch model for</span>
+<span class="sd">    easy and automated training. </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="EndToEndDataModule.__init__"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.EndToEndDataModule.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">ce_fsm_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">ce_time_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">num_primitive_events</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">window_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                <span class="n">zero_windows</span><span class="p">:</span> <span class="nb">dict</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;train&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;test&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span> <span class="n">count_windows</span><span class="p">:</span> <span class="nb">dict</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;train&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;test&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
+                <span class="n">batch_size</span><span class="p">:</span> <span class="nb">dict</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">:</span> <span class="nb">dict</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span> <span class="n">val_split</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="mf">0.2</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; </span>
+
+<span class="sd">        :param dataset: Tuple with keys &#39;train&#39; and &#39;test&#39;, each of which holds a dataset (train and test set respectively). The dataset must be in a format that is iterable, where it can be iterated as data,label pairs. For example, can be a list of tuples, or a Pytorch dataset.</span>
+<span class="sd">        :type dataset: tuple</span>
+<span class="sd">        :param ce_fsm_list: Pattern of primitive events for each complex event</span>
+<span class="sd">        :type ce_fsm_list: list</span>
+<span class="sd">        :param ce_time_list: Temporal metadata pattern for each complex event</span>
+<span class="sd">        :type ce_time_list: list</span>
+<span class="sd">        :param num_primitive_events: Number of primitive events i.e. size of one hot primitive event vectors. </span>
+<span class="sd">        :type num_primitive_events: int</span>
+<span class="sd">        :param window_size: Size of the window of primitive events. </span>
+<span class="sd">        :type window_size: int</span>
+<span class="sd">        :param zero_windows: Include windows that have no complex events if True. Dict of &#39;train&#39;, &#39;val&#39; and &#39;test&#39; to define this for each set, for example so the train set can exclude no complex event windows, but the validation set doesn&#39;t exclude. Defaults to {&#39;train&#39;: True, &#39;val&#39;: True, &#39;test&#39;: True}.</span>
+<span class="sd">        :type zero_windows: dict, optional</span>
+<span class="sd">        :param count_windows: Complex label is a count of complex events if True. Dict of &#39;train&#39;, &#39;val&#39; and &#39;test&#39; to define this for each set. Defaults to {&#39;train&#39;: False, &#39;val&#39;: False, &#39;test&#39;: False}.</span>
+<span class="sd">        :type count_windows: dict, optional</span>
+<span class="sd">        :param batch_size: Batch size of dataset loader. Defaults to 256.</span>
+<span class="sd">        :type batch_size: int, optional</span>
+<span class="sd">        :param num_workers: Number of CPU cores to load data. Defaults to int(os.cpu_count()/2).</span>
+<span class="sd">        :type num_workers: int, optional</span>
+<span class="sd">        :param val_split: Train-Validation split for the train dataset. Defaults to 0.2.</span>
+<span class="sd">        :type val_split: float, optional</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">ce_fsm_list</span> <span class="o">=</span> <span class="n">ce_fsm_list</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">ce_time_list</span> <span class="o">=</span> <span class="n">ce_time_list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_primitive_events</span> <span class="o">=</span> <span class="n">num_primitive_events</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span> <span class="o">=</span> <span class="n">window_size</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">zero_windows</span> <span class="o">=</span> <span class="n">zero_windows</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">count_windows</span> <span class="o">=</span> <span class="n">count_windows</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span> <span class="o">=</span> <span class="n">num_workers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">val_split</span> <span class="o">=</span> <span class="n">val_split</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dl_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;batch_size&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="s1">&#39;num_workers&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span><span class="p">,</span> <span class="s1">&#39;shuffle&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;persistent_workers&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="EndToEndDataModule.prepare_data"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.EndToEndDataModule.prepare_data">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Generate windowed raw input data with complex event labels for end to end training.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># for train and test set </span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">,</span> <span class="s1">&#39;test&#39;</span><span class="p">]:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Preparing </span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2"> dataset&quot;</span><span class="p">)</span>
+            <span class="n">all_data</span> <span class="o">=</span> <span class="p">[]</span> 
+
+            <span class="c1"># get data from iterable object (e.g list of tuples, Pytorch dataset etc.)</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="n">t</span><span class="p">]:</span> <span class="n">all_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">all_data</span><span class="p">)</span> 
+
+            <span class="n">datas</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">xx</span> <span class="ow">in</span> <span class="n">all_data</span><span class="p">:</span> 
+                <span class="n">datas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xx</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> 
+                <span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xx</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+            <span class="c1"># count the windows by complex event label, so show the bias of the (windowed) dataset - i.e. is there enough of each complex event to train?</span>
+            <span class="n">num_classes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ce_fsm_list</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">zero_windows</span><span class="p">[</span><span class="n">t</span><span class="p">]:</span> <span class="n">num_classes</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">class_counter</span> <span class="o">=</span> <span class="p">{}</span> 
+            <span class="n">data_windows</span><span class="p">,</span> <span class="n">label_windows</span><span class="p">,</span> <span class="n">complex_labels</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span> 
+
+            <span class="n">class_counter</span> <span class="o">=</span> <span class="p">{}</span> 
+
+            <span class="c1"># sliding window sampling the data to create windowed data</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">datas</span><span class="p">)</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">),</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">datas</span><span class="p">)</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">):</span>
+                <span class="n">curr_window</span><span class="p">,</span> <span class="n">curr_label</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">datas</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">]),</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">data</span><span class="o">.</span><span class="n">create_primitive_event</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_primitive_events</span><span class="p">,</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">]])</span>
+                <span class="n">curr_complex</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_complex_label</span><span class="p">(</span><span class="n">curr_label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ce_fsm_list</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ce_time_list</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">count_windows</span><span class="p">[</span><span class="n">t</span><span class="p">])</span>
+                <span class="n">curr_simple</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">complex_to_simple</span><span class="p">(</span><span class="n">curr_complex</span><span class="p">)</span>
+
+                <span class="c1"># if using boolean complex labels, make sure no element is &gt;1</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">count_windows</span> <span class="ow">and</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">curr_complex</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span> <span class="k">continue</span>
+                <span class="c1"># if not using no-complex-event windows and window is labelled no-complex-event</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">zero_windows</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="ow">and</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">curr_complex</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span> <span class="k">continue</span>
+
+                <span class="n">data_windows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">curr_window</span><span class="p">)</span>
+                <span class="n">label_windows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">curr_label</span><span class="p">)</span>
+                <span class="n">complex_labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">curr_complex</span><span class="p">)</span>
+                <span class="n">simple</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">complex_to_simple</span><span class="p">(</span><span class="n">curr_complex</span><span class="p">)</span>
+                <span class="n">class_counter</span><span class="p">[</span><span class="n">simple</span><span class="p">]</span> <span class="o">=</span> <span class="n">class_counter</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">simple</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span>
+            
+            <span class="c1"># split train set into train-val sets </span>
+            <span class="n">train_val_split</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">datas</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">val_split</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">t</span><span class="o">==</span><span class="s1">&#39;train&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_windows</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">data_windows</span><span class="p">[:</span><span class="n">train_val_split</span><span class="p">])</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">label_windows</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">label_windows</span><span class="p">[:</span><span class="n">train_val_split</span><span class="p">])</span><span class="o">.</span><span class="n">float</span><span class="p">()</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">complex_labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">complex_labels</span><span class="p">[:</span><span class="n">train_val_split</span><span class="p">])</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_windows_val</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">data_windows</span><span class="p">[</span><span class="n">train_val_split</span><span class="p">:])</span><span class="o">.</span><span class="n">float</span><span class="p">()</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">label_windows_val</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">label_windows</span><span class="p">[</span><span class="n">train_val_split</span><span class="p">:])</span><span class="o">.</span><span class="n">float</span><span class="p">()</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">complex_labels_val</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">complex_labels</span><span class="p">[</span><span class="n">train_val_split</span><span class="p">:])</span><span class="o">.</span><span class="n">float</span><span class="p">()</span> 
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_windows_test</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">data_windows</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">label_windows_test</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">label_windows</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">complex_labels_test</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">complex_labels</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span> 
+
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Class count for </span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">class_counter</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EndToEndDataModule.setup"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.EndToEndDataModule.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Preprocess data depending on the stage (fit or test)</span>
+
+<span class="sd">        :param stage: String denoting the stage needed i.e. fit or test. Defaults to None, which is equivalent to fit.</span>
+<span class="sd">        :type stage: str, optional </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">stage</span> <span class="o">==</span> <span class="s1">&#39;fit&#39;</span> <span class="ow">or</span> <span class="n">stage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span> <span class="o">=</span> <span class="n">EndEndDataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_windows</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">complex_labels</span><span class="p">,</span> <span class="n">labels_intermediate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">label_windows</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">train_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">dl_dict</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">val_dataset</span> <span class="o">=</span> <span class="n">EndEndDataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_windows_val</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">complex_labels_val</span><span class="p">,</span> <span class="n">labels_intermediate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">label_windows_val</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">val_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_dataset</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">dl_dict</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">stage</span> <span class="o">==</span> <span class="s1">&#39;test&#39;</span> <span class="ow">or</span> <span class="n">stage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1">#self.test_dataset = BasicDataset(self.image_windows_test, self.label_windows_test) </span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">test_dataset</span> <span class="o">=</span> <span class="n">EndEndDataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_windows_test</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">complex_labels_test</span><span class="p">,</span> <span class="n">labels_intermediate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">label_windows_test</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">test_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_dataset</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">dl_dict</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="EndToEndDataModule.train_dataloader"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.EndToEndDataModule.train_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot; Return Pytorch DataLoader for train dataset </span>
+
+<span class="sd">        :rtype: torch.utils.data.DataLoader</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_loader</span></div>
+<div class="viewcode-block" id="EndToEndDataModule.val_dataloader"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.EndToEndDataModule.val_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">val_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot; Return Pytorch DataLoader for validation dataset </span>
+
+<span class="sd">        :rtype: torch.utils.data.DataLoader</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_loader</span> </div>
+<div class="viewcode-block" id="EndToEndDataModule.test_dataloader"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.EndToEndDataModule.test_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">test_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot; Return Pytorch DataLoader for test dataset </span>
+
+<span class="sd">        :rtype: torch.utils.data.DataLoader</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_loader</span></div></div>
+
+<div class="viewcode-block" id="EndToEndNoTestDataModule"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.EndToEndNoTestDataModule">[docs]</a><span class="k">class</span> <span class="nc">EndToEndNoTestDataModule</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningDataModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Pytorch Lightning data module to create the end-to-end training dataset for Neuroplytorch. Given a raw input dataset (e.g. MNIST) and the complex event parameters (patterns and metadata),</span>
+<span class="sd">    this will preprocess the data to create the windowed data and necessary labels for end-to-end training. Especially useful in conjunction with the Pytorch Lightning Neuroplytorch model for</span>
+<span class="sd">    easy and automated training. Similar to EndToEndDataModule except uses the test set of the given dataset as the validation set, with no test set.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="EndToEndNoTestDataModule.__init__"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.EndToEndNoTestDataModule.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">ce_fsm_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">ce_time_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">num_primitive_events</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">window_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                <span class="n">zero_windows</span><span class="p">:</span> <span class="nb">dict</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;train&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;test&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span> <span class="n">count_windows</span><span class="p">:</span> <span class="nb">dict</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;train&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;test&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
+                <span class="n">batch_size</span><span class="p">:</span> <span class="nb">dict</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">:</span> <span class="nb">dict</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span> <span class="n">val_split</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="mf">0.2</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot; </span>
+
+<span class="sd">        :param dataset: Tuple with keys &#39;train&#39; and &#39;test&#39;, each of which holds a dataset (train and test set respectively). The dataset must be in a format that is iterable, where it can be iterated as data,label pairs. For example, can be a list of tuples, or a Pytorch dataset.</span>
+<span class="sd">        :type dataset: tuple</span>
+<span class="sd">        :param ce_fsm_list: Pattern of primitive events for each complex event</span>
+<span class="sd">        :type ce_fsm_list: list</span>
+<span class="sd">        :param ce_time_list: Temporal metadata pattern for each complex event</span>
+<span class="sd">        :type ce_time_list: list</span>
+<span class="sd">        :param num_primitive_events: Number of primitive events i.e. size of one hot primitive event vectors. </span>
+<span class="sd">        :type num_primitive_events: int</span>
+<span class="sd">        :param window_size: Size of the window of primitive events. </span>
+<span class="sd">        :type window_size: int</span>
+<span class="sd">        :param zero_windows: Include windows that have no complex events if True. Dict of &#39;train&#39;, &#39;val&#39; and &#39;test&#39; to define this for each set, for example so the train set can exclude no complex event windows, but the validation set doesn&#39;t exclude. Defaults to {&#39;train&#39;: True, &#39;val&#39;: True, &#39;test&#39;: True}.</span>
+<span class="sd">        :type zero_windows: dict, optional</span>
+<span class="sd">        :param count_windows: Complex label is a count of complex events if True. Dict of &#39;train&#39;, &#39;val&#39; and &#39;test&#39; to define this for each set. Defaults to {&#39;train&#39;: False, &#39;val&#39;: False, &#39;test&#39;: False}.</span>
+<span class="sd">        :type count_windows: dict, optional</span>
+<span class="sd">        :param batch_size: Batch size of dataset loader. Defaults to 256.</span>
+<span class="sd">        :type batch_size: int, optional</span>
+<span class="sd">        :param num_workers: Number of CPU cores to load data. Defaults to int(os.cpu_count()/2).</span>
+<span class="sd">        :type num_workers: int, optional</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">ce_fsm_list</span> <span class="o">=</span> <span class="n">ce_fsm_list</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">ce_time_list</span> <span class="o">=</span> <span class="n">ce_time_list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_primitive_events</span> <span class="o">=</span> <span class="n">num_primitive_events</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span> <span class="o">=</span> <span class="n">window_size</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">zero_windows</span> <span class="o">=</span> <span class="n">zero_windows</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">count_windows</span> <span class="o">=</span> <span class="n">count_windows</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span> <span class="o">=</span> <span class="n">num_workers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">val_split</span> <span class="o">=</span> <span class="n">val_split</span>
+    
+        <span class="bp">self</span><span class="o">.</span><span class="n">dl_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;batch_size&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="s1">&#39;num_workers&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span><span class="p">,</span> <span class="s1">&#39;shuffle&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;persistent_workers&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="EndToEndNoTestDataModule.prepare_data"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.EndToEndNoTestDataModule.prepare_data">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Generate windowed raw input data with complex event labels for end to end training.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># for train and test set </span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">,</span> <span class="s1">&#39;test&#39;</span><span class="p">]:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Preparing </span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2"> dataset&quot;</span><span class="p">)</span>
+            <span class="n">all_data</span> <span class="o">=</span> <span class="p">[]</span> 
+
+            <span class="c1"># get data from iterable object (e.g list of tuples, Pytorch dataset etc.)</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="n">t</span><span class="p">]:</span> <span class="n">all_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">all_data</span><span class="p">)</span> 
+
+            <span class="n">datas</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">xx</span> <span class="ow">in</span> <span class="n">all_data</span><span class="p">:</span> 
+                <span class="n">datas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xx</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> 
+                <span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xx</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+            <span class="c1"># count the windows by complex event label, so show the bias of the (windowed) dataset - i.e. is there enough of each complex event to train?</span>
+            <span class="n">num_classes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ce_fsm_list</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">zero_windows</span><span class="p">[</span><span class="n">t</span><span class="p">]:</span> <span class="n">num_classes</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">class_counter</span> <span class="o">=</span> <span class="p">{}</span> 
+            <span class="n">data_windows</span><span class="p">,</span> <span class="n">label_windows</span><span class="p">,</span> <span class="n">complex_labels</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span> 
+
+            <span class="n">class_counter</span> <span class="o">=</span> <span class="p">{}</span> 
+            <span class="n">class_no_zero_counter</span> <span class="o">=</span> <span class="p">{}</span> 
+
+            <span class="c1"># sliding window sampling the data to create windowed data</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">datas</span><span class="p">)</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">),</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">datas</span><span class="p">)</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">):</span>
+                <span class="n">curr_window</span><span class="p">,</span> <span class="n">curr_label</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">datas</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">]),</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">data</span><span class="o">.</span><span class="n">create_primitive_event</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_primitive_events</span><span class="p">,</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">]])</span>
+                <span class="n">curr_complex</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_complex_label</span><span class="p">(</span><span class="n">curr_label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ce_fsm_list</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ce_time_list</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">count_windows</span><span class="p">[</span><span class="n">t</span><span class="p">])</span>
+                <span class="n">curr_simple</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">complex_to_simple</span><span class="p">(</span><span class="n">curr_complex</span><span class="p">)</span>
+
+                <span class="c1"># if using boolean complex labels, make sure no element is &gt;1</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">count_windows</span> <span class="ow">and</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">curr_complex</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span> <span class="k">continue</span>
+                <span class="c1"># if not using no-complex-event windows and window is labelled no-complex-event</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">zero_windows</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="ow">and</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">curr_complex</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span> <span class="k">continue</span>
+
+                <span class="c1">#MAX_0 = 10000</span>
+                <span class="c1">#if True and t==&#39;train&#39;: # if balance </span>
+                <span class="c1">#    if curr_simple==0 and class_counter.get(0,0)&gt;=MAX_0: continue</span>
+
+                <span class="n">data_windows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">curr_window</span><span class="p">)</span>
+                <span class="n">label_windows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">curr_label</span><span class="p">)</span>
+                <span class="n">complex_labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">curr_complex</span><span class="p">)</span>
+                <span class="n">simple</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">complex_to_simple</span><span class="p">(</span><span class="n">curr_complex</span><span class="p">)</span>
+                <span class="n">class_counter</span><span class="p">[</span><span class="n">simple</span><span class="p">]</span> <span class="o">=</span> <span class="n">class_counter</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">simple</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span> 
+                <span class="k">if</span> <span class="n">simple</span><span class="p">:</span> <span class="n">class_no_zero_counter</span><span class="p">[</span><span class="n">simple</span><span class="p">]</span> <span class="o">=</span> <span class="n">class_no_zero_counter</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">simple</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span>
+
+
+
+            <span class="k">if</span> <span class="n">t</span><span class="o">==</span><span class="s1">&#39;train&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_windows</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">data_windows</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">label_windows</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">label_windows</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">complex_labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">complex_labels</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_windows_test</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">data_windows</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">label_windows_test</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">label_windows</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">complex_labels_test</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">complex_labels</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span> 
+
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Class count for </span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">class_counter</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EndToEndNoTestDataModule.setup"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.EndToEndNoTestDataModule.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Preprocess data depending on the stage (fit or test)</span>
+
+<span class="sd">        :param stage: String denoting the stage needed i.e. fit or test. Defaults to None, which is equivalent to fit.</span>
+<span class="sd">        :type stage: str, optional </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">stage</span> <span class="o">==</span> <span class="s1">&#39;fit&#39;</span> <span class="ow">or</span> <span class="n">stage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span> <span class="o">=</span> <span class="n">EndEndDataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_windows</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">complex_labels</span><span class="p">,</span> <span class="n">labels_intermediate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">label_windows</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">train_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">dl_dict</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">test_dataset</span> <span class="o">=</span> <span class="n">EndEndDataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_windows_test</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">complex_labels_test</span><span class="p">,</span> <span class="n">labels_intermediate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">label_windows_test</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">test_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_dataset</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">dl_dict</span><span class="p">)</span></div>
+
+        
+
+        
+<div class="viewcode-block" id="EndToEndNoTestDataModule.train_dataloader"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.EndToEndNoTestDataModule.train_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot; Return Pytorch DataLoader for train dataset </span>
+
+<span class="sd">        :rtype: torch.utils.data.DataLoader</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_loader</span></div>
+<div class="viewcode-block" id="EndToEndNoTestDataModule.val_dataloader"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.EndToEndNoTestDataModule.val_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">val_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot; Return Pytorch DataLoader for validation dataset </span>
+
+<span class="sd">        :rtype: torch.utils.data.DataLoader</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_loader</span> </div></div>
+
+<span class="c1"># CUSTOM DATA MODULES FOR INDIVIDUAL DATASETS</span>
+<div class="viewcode-block" id="MNISTDataModule"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.MNISTDataModule">[docs]</a><span class="k">class</span> <span class="nc">MNISTDataModule</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningDataModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Pytorch Lightning data module for MNIST dataset. Will load MNIST dataset from torchvision and cache locally in ./datasets/MNIST folder.</span>
+<span class="sd">    Used for automatic data preprocessing, loading etc. for use with Pytorch Lightning module.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="MNISTDataModule.__init__"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.MNISTDataModule.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="o">=</span><span class="s2">&quot;./datasets/MNIST&quot;</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">val_split</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param data_dir: Directory to save local copy of dataset for offline caching. Defaults to &quot;./datasets/MNIST&quot;.</span>
+<span class="sd">        :type data_dir: str, optional</span>
+<span class="sd">        :param batch_size: Batch size of dataset loader. Defaults to 256.</span>
+<span class="sd">        :type batch_size: int, optional</span>
+<span class="sd">        :param num_workers: Number of CPU cores to load data. Defaults to int(os.cpu_count()/2).</span>
+<span class="sd">        :type num_workers: int, optional</span>
+<span class="sd">        :param val_split: Train-Validation split for the train dataset. Defaults to 0.2.</span>
+<span class="sd">        :type val_split: float, optional</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span> <span class="o">=</span> <span class="n">data_dir</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span> <span class="o">=</span> <span class="n">num_workers</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">val_split</span> <span class="o">=</span> <span class="n">val_split</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span><span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">((</span><span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">)),</span><span class="n">torchvision</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span><span class="n">torchvision</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">((</span><span class="mf">0.1307</span><span class="p">,),</span> <span class="p">(</span><span class="mf">0.3081</span><span class="p">,))])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dl_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;batch_size&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="s1">&#39;num_workers&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span><span class="p">,</span> <span class="s1">&#39;shuffle&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;persistent_workers&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="MNISTDataModule.prepare_data"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.MNISTDataModule.prepare_data">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Pytorch lightning overloaded method to prepare the data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># load train and test set for MNIST from torchvision, download if not cached </span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]:</span> <span class="n">tvdatasets</span><span class="o">.</span><span class="n">MNIST</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MNISTDataModule.setup"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.MNISTDataModule.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Preprocess data depending on the stage (fit or test)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            stage (str, optional): String denoting the stage needed i.e. fit or test. Defaults to None, which is equivalent to fit.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">stage</span> <span class="o">==</span> <span class="s1">&#39;fit&#39;</span> <span class="ow">or</span> <span class="n">stage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">mnist_full</span> <span class="o">=</span> <span class="n">tvdatasets</span><span class="o">.</span><span class="n">MNIST</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">)</span>
+            <span class="n">train_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">mnist_full</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">val_split</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mnist_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mnist_val</span> <span class="o">=</span> <span class="n">random_split</span><span class="p">(</span><span class="n">mnist_full</span><span class="p">,</span> <span class="p">[</span><span class="n">train_size</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">mnist_full</span><span class="p">)</span><span class="o">-</span><span class="n">train_size</span><span class="p">])</span> 
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">mnist_train_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mnist_train</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">dl_dict</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mnist_val_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mnist_val</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">dl_dict</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">stage</span> <span class="o">==</span> <span class="s1">&#39;test&#39;</span> <span class="ow">or</span> <span class="n">stage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mnist_test</span> <span class="o">=</span> <span class="n">tvdatasets</span><span class="o">.</span><span class="n">MNIST</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mnist_test_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mnist_test</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">dl_dict</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MNISTDataModule.train_dataloader"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.MNISTDataModule.train_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot; Return Pytorch DataLoader for train dataset </span>
+
+<span class="sd">        :rtype: torch.utils.data.DataLoader</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mnist_train_loader</span></div>
+<div class="viewcode-block" id="MNISTDataModule.val_dataloader"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.MNISTDataModule.val_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">val_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot; Return Pytorch DataLoader for validation dataset </span>
+
+<span class="sd">        :rtype: torch.utils.data.DataLoader</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mnist_val_loader</span> </div>
+<div class="viewcode-block" id="MNISTDataModule.test_dataloader"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.MNISTDataModule.test_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">test_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot; Return Pytorch DataLoader for test dataset </span>
+
+<span class="sd">        :rtype: torch.utils.data.DataLoader</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mnist_test_loader</span></div></div>
+
+<div class="viewcode-block" id="EMNISTDataModule"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.EMNISTDataModule">[docs]</a><span class="k">class</span> <span class="nc">EMNISTDataModule</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningDataModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Pytorch Lightning data module for EMNIST dataset. Will load EMNIST dataset from torchvision and cache locally in ./datasets/EMNIST folder.</span>
+<span class="sd">    Used for automatic data preprocessing, loading etc. for use with Pytorch Lightning module.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="EMNISTDataModule.__init__"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.EMNISTDataModule.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="o">=</span><span class="s2">&quot;./datasets/EMNIST&quot;</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">val_split</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param data_dir: Directory to save local copy of dataset for offline caching. Defaults to &quot;./datasets/EMNIST&quot;.</span>
+<span class="sd">        :type data_dir: str, optional</span>
+<span class="sd">        :param batch_size: Batch size of dataset loader. Defaults to 256.</span>
+<span class="sd">        :type batch_size: int, optional</span>
+<span class="sd">        :param num_workers: Number of CPU cores to load data. Defaults to int(os.cpu_count()/2).</span>
+<span class="sd">        :type num_workers: int, optional</span>
+<span class="sd">        :param val_split: Train-Validation split for the train dataset. Defaults to 0.2.</span>
+<span class="sd">        :type val_split: float, optional</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span> <span class="o">=</span> <span class="n">data_dir</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span> <span class="o">=</span> <span class="n">num_workers</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">val_split</span> <span class="o">=</span> <span class="n">val_split</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span><span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">((</span><span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">)),</span><span class="n">torchvision</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">()])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dl_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;batch_size&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="s1">&#39;num_workers&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span><span class="p">,</span> <span class="s1">&#39;shuffle&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;persistent_workers&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="EMNISTDataModule.prepare_data"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.EMNISTDataModule.prepare_data">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Pytorch lightning overloaded method to prepare the data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># load train and test set for MNIST from torchvision, download if not cached </span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]:</span> <span class="n">tvdatasets</span><span class="o">.</span><span class="n">EMNIST</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="s1">&#39;letters&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EMNISTDataModule.setup"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.EMNISTDataModule.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Preprocess data depending on the stage (fit or test)</span>
+
+<span class="sd">        :param stage: String denoting the stage needed i.e. fit or test. Defaults to None, which is equivalent to fit.</span>
+<span class="sd">        :type stage: str, optional </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">stage</span> <span class="o">==</span> <span class="s1">&#39;fit&#39;</span> <span class="ow">or</span> <span class="n">stage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">emnist_full</span> <span class="o">=</span> <span class="n">tvdatasets</span><span class="o">.</span><span class="n">EMNIST</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="s1">&#39;letters&#39;</span><span class="p">)</span>
+            <span class="n">emnist_full</span><span class="o">.</span><span class="n">targets</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="n">train_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">emnist_full</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">val_split</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">emnist_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">emnist_val</span> <span class="o">=</span> <span class="n">random_split</span><span class="p">(</span><span class="n">emnist_full</span><span class="p">,</span> <span class="p">[</span><span class="n">train_size</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">emnist_full</span><span class="p">)</span><span class="o">-</span><span class="n">train_size</span><span class="p">])</span> 
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">emnist_train_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">emnist_train</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">dl_dict</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">emnist_val_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">emnist_val</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">dl_dict</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">stage</span> <span class="o">==</span> <span class="s1">&#39;test&#39;</span> <span class="ow">or</span> <span class="n">stage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">emnist_test</span> <span class="o">=</span> <span class="n">tvdatasets</span><span class="o">.</span><span class="n">EMNIST</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="s1">&#39;letters&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">emnist_test_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">emnist_test</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">dl_dict</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EMNISTDataModule.train_dataloader"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.EMNISTDataModule.train_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot; Return Pytorch DataLoader for train dataset </span>
+
+<span class="sd">        :rtype: torch.utils.data.DataLoader</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">emnist_train_loader</span></div>
+<div class="viewcode-block" id="EMNISTDataModule.val_dataloader"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.EMNISTDataModule.val_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">val_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot; Return Pytorch DataLoader for validation dataset </span>
+
+<span class="sd">        :rtype: torch.utils.data.DataLoader</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">emnist_val_loader</span> </div>
+<div class="viewcode-block" id="EMNISTDataModule.test_dataloader"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.EMNISTDataModule.test_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">test_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot; Return Pytorch DataLoader for test dataset </span>
+
+<span class="sd">        :rtype: torch.utils.data.DataLoader</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">emnist_test_loader</span></div></div>
+
+<span class="k">class</span> <span class="nc">UrbanDataModule</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningDataModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; </span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="o">=</span><span class="s2">&quot;./datasets/UrbanSound8K&quot;</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">val_split</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param data_dir: Directory to save local copy of dataset for offline caching. Defaults to &quot;./datasets/UrbanSound8K&quot;.</span>
+<span class="sd">        :type data_dir: str, optional</span>
+<span class="sd">        :param batch_size: Batch size of dataset loader. Defaults to 256.</span>
+<span class="sd">        :type batch_size: int, optional</span>
+<span class="sd">        :param num_workers: Number of CPU cores to load data. Defaults to int(os.cpu_count()/2).</span>
+<span class="sd">        :type num_workers: int, optional</span>
+<span class="sd">        :param val_split: Train-Validation split for the train dataset. Defaults to 0.2.</span>
+<span class="sd">        :type val_split: float, optional</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span> <span class="o">=</span> <span class="n">data_dir</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span> <span class="o">=</span> <span class="n">num_workers</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">val_split</span> <span class="o">=</span> <span class="n">val_split</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dl_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;batch_size&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="s1">&#39;num_workers&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span><span class="p">,</span> <span class="s1">&#39;shuffle&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;persistent_workers&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">prepare_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Pytorch lightning overloaded method to prepare the data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># load train and test set for MNIST from torchvision, download if not cached </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">fetch_perception_data_local</span><span class="p">(</span><span class="n">dataset_loc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">dataset_type</span><span class="o">=</span><span class="s1">&#39;audio_wav&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Preprocess data depending on the stage (fit or test)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            stage (str, optional): String denoting the stage needed i.e. fit or test. Defaults to None, which is equivalent to fit.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">stage</span> <span class="o">==</span> <span class="s1">&#39;fit&#39;</span> <span class="ow">or</span> <span class="n">stage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">train_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">])</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">val_split</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">audio_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">audio_val</span> <span class="o">=</span> <span class="n">random_split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">],</span> <span class="p">[</span><span class="n">train_size</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">])</span><span class="o">-</span><span class="n">train_size</span><span class="p">])</span> 
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">audio_train_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">audio_train</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">dl_dict</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">audio_val_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">audio_val</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">dl_dict</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">stage</span> <span class="o">==</span> <span class="s1">&#39;test&#39;</span> <span class="ow">or</span> <span class="n">stage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">audio_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">audio_test_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">audio_test</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">dl_dict</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot; Return Pytorch DataLoader for train dataset </span>
+
+<span class="sd">        :rtype: torch.utils.data.DataLoader</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">audio_train_loader</span>
+    <span class="k">def</span> <span class="nf">val_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot; Return Pytorch DataLoader for validation dataset </span>
+
+<span class="sd">        :rtype: torch.utils.data.DataLoader</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">audio_val_loader</span> 
+    <span class="k">def</span> <span class="nf">test_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot; Return Pytorch DataLoader for test dataset </span>
+
+<span class="sd">        :rtype: torch.utils.data.DataLoader</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">audio_test_loader</span>
+
+<div class="viewcode-block" id="get_datamodule"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.get_datamodule">[docs]</a><span class="k">def</span> <span class="nf">get_datamodule</span><span class="p">(</span><span class="n">datamodule_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pl</span><span class="o">.</span><span class="n">LightningDataModule</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Fetch the Pytorch Lightning DataModule specified by the string datamodule_str</span>
+
+<span class="sd">    :param datamodule_str: Name of the Pytorch Lightning DataModule to return </span>
+<span class="sd">    :type datamodule_str: str</span>
+
+<span class="sd">    :rtype: pytorch_lightning.LightningDataModule</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">datamodule_str</span><span class="o">==</span><span class="s1">&#39;PerceptionWindowDataModule&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="n">PerceptionWindowDataModule</span>
+    <span class="k">if</span> <span class="n">datamodule_str</span><span class="o">==</span><span class="s1">&#39;ReasoningDataModule&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="n">ReasoningDataModule</span>
+    <span class="k">if</span> <span class="n">datamodule_str</span><span class="o">==</span><span class="s1">&#39;MNISTDataModule&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="n">MNISTDataModule</span>
+    <span class="k">if</span> <span class="n">datamodule_str</span><span class="o">==</span><span class="s1">&#39;EMNISTDataModule&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="n">EMNISTDataModule</span>
+    <span class="k">if</span> <span class="n">datamodule_str</span><span class="o">==</span><span class="s1">&#39;UrbanDataModule&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="n">UrbanDataModule</span></div>
+
+
+<div class="viewcode-block" id="fetch_perception_data"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.fetch_perception_data">[docs]</a><span class="k">def</span> <span class="nf">fetch_perception_data</span><span class="p">(</span><span class="n">dataset_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dataset_loc</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;./datasets/MNIST&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Fetch raw input data from torchvision datasets</span>
+
+<span class="sd">    :param dataset_str: Name of dataset from torchvision to fetch. Examples include MNIST, EMNIST etc.</span>
+<span class="sd">    :type dataset_str: str</span>
+<span class="sd">    :param dataset_loc: Directory to save a local copy of the dataset for offline caching. Defaults to ./datasets/MNIST</span>
+<span class="sd">    :type dataset_loc: str, optional</span>
+
+<span class="sd">    :return: Dictionary with keys for &#39;train&#39; and &#39;test&#39; split, each of which holds a torch.utils.data.Dataset dataset</span>
+<span class="sd">    :rtype: dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">{}</span> 
+    <span class="k">if</span> <span class="n">dataset_str</span><span class="o">==</span><span class="s1">&#39;MNIST&#39;</span><span class="p">:</span>
+        <span class="n">x</span><span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">torchvision</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">MNIST</span><span class="p">(</span><span class="n">dataset_loc</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">torchvision</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">((</span><span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">)),</span><span class="n">torchvision</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span><span class="n">torchvision</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">((</span><span class="mf">0.1307</span><span class="p">,),</span> <span class="p">(</span><span class="mf">0.3081</span><span class="p">,))]</span>
+            <span class="p">))</span>
+        <span class="n">x</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">torchvision</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">MNIST</span><span class="p">(</span><span class="n">dataset_loc</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">torchvision</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">((</span><span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">)),</span><span class="n">torchvision</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span><span class="n">torchvision</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">((</span><span class="mf">0.1307</span><span class="p">,),</span> <span class="p">(</span><span class="mf">0.3081</span><span class="p">,))]</span>
+            <span class="p">))</span>
+    <span class="k">elif</span> <span class="n">dataset_str</span><span class="o">==</span><span class="s1">&#39;EMNIST&#39;</span><span class="p">:</span>
+        <span class="n">x</span><span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">torchvision</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">EMNIST</span><span class="p">(</span><span class="s1">&#39;datasets/EMNIST&#39;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">torchvision</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">((</span><span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">)),</span><span class="n">torchvision</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">()]),</span> <span class="n">split</span><span class="o">=</span><span class="s1">&#39;letters&#39;</span>
+            <span class="p">)</span>
+        <span class="n">x</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">torchvision</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">EMNIST</span><span class="p">(</span><span class="n">dataset_loc</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">torchvision</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">((</span><span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">)),</span><span class="n">torchvision</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">()]),</span> <span class="n">split</span><span class="o">=</span><span class="s1">&#39;letters&#39;</span>
+            <span class="p">)</span>
+        
+        <span class="c1"># EMNIST classes default 1-26, so need 0-25</span>
+        <span class="n">x</span><span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">targets</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="n">x</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">targets</span> <span class="o">-=</span> <span class="mi">1</span>
+
+        
+
+    <span class="k">return</span> <span class="n">x</span></div>
+
+<div class="viewcode-block" id="fetch_perception_data_local"><a class="viewcode-back" href="../../api/datasets.html#data.datasets.fetch_perception_data_local">[docs]</a><span class="k">def</span> <span class="nf">fetch_perception_data_local</span><span class="p">(</span><span class="n">dataset_loc</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dataset_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Fetch raw input data from datasets folder</span>
+
+<span class="sd">    :param dataset_loc: Location of dataset directory.</span>
+<span class="sd">    :type dataset_loc: str</span>
+<span class="sd">    :param dataset_type: Type of data in the dataset e.g. text, audio etc. </span>
+<span class="sd">    :type dataset_type: str</span>
+
+<span class="sd">    :return: Dictionary with keys for &#39;train&#39; and &#39;test&#39; split, each of which holds a torch.utils.data.Dataset dataset</span>
+<span class="sd">    :rtype: dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">{}</span> 
+    <span class="k">if</span> <span class="n">dataset_type</span><span class="o">==</span><span class="s1">&#39;audio_wav&#39;</span><span class="p">:</span>
+        <span class="n">xs</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_waveforms</span><span class="p">(</span><span class="n">dataset_loc</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> 
+        <span class="n">xs_train</span><span class="p">,</span> <span class="n">xs_test</span><span class="p">,</span> <span class="n">ys_train</span><span class="p">,</span> <span class="n">ys_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+        <span class="n">x</span><span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">BasicDataset</span><span class="p">(</span><span class="n">xs_train</span><span class="p">,</span> <span class="n">ys_train</span><span class="p">)</span>
+        <span class="n">x</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">BasicDataset</span><span class="p">(</span><span class="n">xs_test</span><span class="p">,</span> <span class="n">ys_test</span><span class="p">)</span>
+
+
+    <span class="k">return</span> <span class="n">x</span></div>
+        
+    
+
+
+
+
+
+
+
+
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Cai Davies.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

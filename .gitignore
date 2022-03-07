@@ -1,0 +1,14 @@
+*-ubyte
+*.gz
+*.pyc
+*.txt
+*.zip
+*.p
+*.png
+*.wav
+
+OLD
+lightning_logs
+datasets
+
+!*.rst

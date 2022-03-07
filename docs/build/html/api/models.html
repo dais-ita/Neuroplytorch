@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Models module &mdash; Neuroplytorch 1.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Datasets module" href="datasets.html" />
+    <link rel="prev" title="Basic Models module" href="basic_models.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Neuroplytorch
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to Neuroplytorch’s documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../how_to.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="basic_models.html">Basic Models module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Models module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pytorch-lightning-modules">Pytorch Lightning modules</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#reasoningmodel">ReasoningModel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#perceptionwindow">PerceptionWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#neuroplytorch">Neuroplytorch</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#mnistmodel">MNISTModel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#emnistmodel">EMNISTModel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#methods">Methods</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="datasets.html">Datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data.html">Data module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="losses.html">Losses module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parser.html">Parser module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Neuroplytorch</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">API documentation</a> &raquo;</li>
+      <li>Models module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/models.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="models-module">
+<span id="models-page"></span><h1>Models module<a class="headerlink" href="#models-module" title="Permalink to this headline"></a></h1>
+<section id="pytorch-lightning-modules">
+<h2>Pytorch Lightning modules<a class="headerlink" href="#pytorch-lightning-modules" title="Permalink to this headline"></a></h2>
+<section id="reasoningmodel">
+<h3>ReasoningModel<a class="headerlink" href="#reasoningmodel" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="training.models.ReasoningModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">training.models.</span></span><span class="sig-name descname"><span class="pre">ReasoningModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_relu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annealing_step</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'MSELoss'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/training/models.html#ReasoningModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.ReasoningModel" title="Permalink to this definition"></a></dt>
+<dd><p>Pytorch Lightning Module to train the reasoning layer of the Neuroplytorch model. Uses an LSTM neural network for a differentiable reasoning layer.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.ReasoningModel.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_relu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annealing_step</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'MSELoss'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/training/models.html#ReasoningModel.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.ReasoningModel.__init__" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_size</strong> (<em>int</em>) – Size of the input data (each element of the sequence).</p></li>
+<li><p><strong>output_size</strong> (<em>int</em>) – Size of the output, for the case of Neuroplex this would be the number of complex events, resulting in an output vector of size output_size.</p></li>
+<li><p><strong>hidden_size</strong> (<em>int</em><em>, </em><em>optional</em>) – LSTM hidden layer size. Defaults to 64.</p></li>
+<li><p><strong>use_relu</strong> (<em>bool</em><em>, </em><em>optional</em>) – Use ReLU on output or not. This is for use with Evidential Deep Learning loss functions. Defaults to False.</p></li>
+<li><p><strong>annealing_step</strong> (<em>int</em><em>, </em><em>optional</em>) – Annealing step parameter for Evidential Deep Learning loss functions. Defaults to 1.</p></li>
+<li><p><strong>loss_str</strong> (<em>str</em><em>, </em><em>optional</em>) – Loss function name to use for training. Defaults to ‘MSELoss’.</p></li>
+<li><p><strong>lr</strong> (<em>float</em><em>, </em><em>optional</em>) – Learning rate for optimizer. Defaults to 0.001.</p></li>
+<li><p><strong>name</strong> (<em>str</em><em>, </em><em>optional</em>) – Separates the checkpoint weights, so experiment name goes here. Defalts to ‘’.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.ReasoningModel.calculate_accuracy">
+<span class="sig-name descname"><span class="pre">calculate_accuracy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yPred</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yTrue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None._VariableFunctionsClass.tensor</span></span></span><a class="reference internal" href="../_modules/training/models.html#ReasoningModel.calculate_accuracy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.ReasoningModel.calculate_accuracy" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate accuracy of forward pass. Reasoning model accuracy for a single instance is either 1.0 or 0.0, and must have both vectors match perfectly to be correct, otherwise is 0.0, regardless of whether some elements of each vector match.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>yPred</strong> (<em>torch.tensor</em>) – Output of model</p></li>
+<li><p><strong>yTrue</strong> (<em>torch.tensor</em>) – Ground truth label</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Mean accuracy of yPred with yTrue as ground truth</p>
+</dd>
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.ReasoningModel.calculate_loss">
+<span class="sig-name descname"><span class="pre">calculate_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yPred</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yTrue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None._VariableFunctionsClass.tensor</span></span></span><a class="reference internal" href="../_modules/training/models.html#ReasoningModel.calculate_loss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.ReasoningModel.calculate_loss" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate loss of forward pass using loss function provided on model initialisation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>yPred</strong> (<em>torch.tensor</em>) – Output of model</p></li>
+<li><p><strong>yTrue</strong> (<em>torch.tensor</em>) – Ground truth label</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Loss of yPred with yTrue as ground truth</p>
+</dd>
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.ReasoningModel.configure_optimizers">
+<span class="sig-name descname"><span class="pre">configure_optimizers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/training/models.html#ReasoningModel.configure_optimizers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.ReasoningModel.configure_optimizers" title="Permalink to this definition"></a></dt>
+<dd><p>Configure the optimizer (Adam) for training using a learning rate provided on model initialisation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Optimizer set to model parameters</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.ReasoningModel.evaluate">
+<span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/training/models.html#ReasoningModel.evaluate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.ReasoningModel.evaluate" title="Permalink to this definition"></a></dt>
+<dd><p>Forward pass a batch (used for train, val and test batches). Each step/epoch is logged with metrics loss and accuracy using Tensorboard.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch</strong> (<em>torch.tensor</em>) – Input data as batch</p></li>
+<li><p><strong>batch_idx</strong> (<em>int</em>) – Unused but needed in overloading</p></li>
+<li><p><strong>stage</strong> (<em>str</em><em>, </em><em>optional</em>) – Name of the current stage i.e. train, val or test. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Loss and accuracy as keys</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.ReasoningModel.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None._VariableFunctionsClass.tensor</span></span></span><a class="reference internal" href="../_modules/training/models.html#ReasoningModel.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.ReasoningModel.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Model forward pass</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>torch.tensor</em>) – Model input</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Model output</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.ReasoningModel.on_train_epoch_end">
+<span class="sig-name descname"><span class="pre">on_train_epoch_end</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/training/models.html#ReasoningModel.on_train_epoch_end"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.ReasoningModel.on_train_epoch_end" title="Permalink to this definition"></a></dt>
+<dd><p>Called in the training loop at the very end of the epoch.</p>
+<p>To access all batch outputs at the end of the epoch, either:</p>
+<ol class="arabic simple">
+<li><p>Implement <cite>training_epoch_end</cite> in the LightningModule OR</p></li>
+<li><p>Cache data across steps on the attribute(s) of the <cite>LightningModule</cite> and access them in this hook</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.ReasoningModel.save_weights">
+<span class="sig-name descname"><span class="pre">save_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/training/models.html#ReasoningModel.save_weights"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.ReasoningModel.save_weights" title="Permalink to this definition"></a></dt>
+<dd><p>Save the model weights only using pure Pytorch implementation of saving weights.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.ReasoningModel.test_step">
+<span class="sig-name descname"><span class="pre">test_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/training/models.html#ReasoningModel.test_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.ReasoningModel.test_step" title="Permalink to this definition"></a></dt>
+<dd><p>On test step, call self.evaluate (forward pass) and return</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch</strong> (<em>torch.tensor</em>) – Input data as batch</p></li>
+<li><p><strong>batch_idx</strong> (<em>int</em>) – Unused but needed in overloading</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output from self.evaluate</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.ReasoningModel.training_step">
+<span class="sig-name descname"><span class="pre">training_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/training/models.html#ReasoningModel.training_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.ReasoningModel.training_step" title="Permalink to this definition"></a></dt>
+<dd><p>On training step, call self.evaluate (forward pass) and return</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch</strong> (<em>torch.tensor</em>) – Input data as batch</p></li>
+<li><p><strong>batch_idx</strong> (<em>int</em>) – Unused but needed in overloading</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output from self.evaluate</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.ReasoningModel.validation_step">
+<span class="sig-name descname"><span class="pre">validation_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/training/models.html#ReasoningModel.validation_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.ReasoningModel.validation_step" title="Permalink to this definition"></a></dt>
+<dd><p>On validation step, call self.evaluate (forward pass) and return</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch</strong> (<em>torch.tensor</em>) – Input data as batch</p></li>
+<li><p><strong>batch_idx</strong> (<em>int</em>) – Unused but needed in overloading</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output from self.evaluate</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="perceptionwindow">
+<h3>PerceptionWindow<a class="headerlink" href="#perceptionwindow" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="training.models.PerceptionWindow">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">training.models.</span></span><span class="sig-name descname"><span class="pre">PerceptionWindow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">perception_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.nn.modules.module.Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_primitive_events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/training/models.html#PerceptionWindow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.PerceptionWindow" title="Permalink to this definition"></a></dt>
+<dd><p>Pytorch Lightning Module wrapping the LeNet pure Pytorch model for training with the EndToEndDataModule or EndToEndNoTestDataModule using Pytorch Lightning. Uses the intermediate label
+from the dataset to train the model on windowed data, similar to how the pereception layer is trained in the Neuroplytorch model but excluding the reasoning layer.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.PerceptionWindow.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">perception_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.nn.modules.module.Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_primitive_events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/training/models.html#PerceptionWindow.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.PerceptionWindow.__init__" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>perception_model</strong> – The perception model to use on the windowed data</p></li>
+<li><p><strong>window_size</strong> (<em>int</em>) – Size of the window of primitive events.</p></li>
+<li><p><strong>num_primitive_events</strong> (<em>int</em>) – Number of primitive events i.e. size of one hot primitive event vectors.</p></li>
+<li><p><strong>loss_str</strong> (<em>str</em>) – Loss function name to use for training.</p></li>
+<li><p><strong>lr</strong> (<em>float</em>) – Learning rate for optimizer.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.PerceptionWindow.calculate_accuracy">
+<span class="sig-name descname"><span class="pre">calculate_accuracy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yPred</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yTrue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None._VariableFunctionsClass.tensor</span></span></span><a class="reference internal" href="../_modules/training/models.html#PerceptionWindow.calculate_accuracy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.PerceptionWindow.calculate_accuracy" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate accuracy of forward pass.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>yPred</strong> (<em>torch.tensor</em>) – Output of model</p></li>
+<li><p><strong>yTrue</strong> (<em>torch.tensor</em>) – Ground truth label</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Mean accuracy of yPred with yTrue as ground truth</p>
+</dd>
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.PerceptionWindow.calculate_loss">
+<span class="sig-name descname"><span class="pre">calculate_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yPred</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yTrue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None._VariableFunctionsClass.tensor</span></span></span><a class="reference internal" href="../_modules/training/models.html#PerceptionWindow.calculate_loss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.PerceptionWindow.calculate_loss" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate loss of model output with respect to ground truth and loss function provided on model initialisation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>yPred</strong> (<em>torch.tensor</em>) – Output of model</p></li>
+<li><p><strong>yTrue</strong> (<em>torch.tensor</em>) – Ground truth label</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Loss of yPred with yTrue as ground truth</p>
+</dd>
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.PerceptionWindow.configure_optimizers">
+<span class="sig-name descname"><span class="pre">configure_optimizers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/training/models.html#PerceptionWindow.configure_optimizers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.PerceptionWindow.configure_optimizers" title="Permalink to this definition"></a></dt>
+<dd><p>Configure the optimizer (Adam) for training using a learning rate provided on model initialisation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Optimizer set to model parameters</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.PerceptionWindow.evaluate">
+<span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/training/models.html#PerceptionWindow.evaluate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.PerceptionWindow.evaluate" title="Permalink to this definition"></a></dt>
+<dd><p>Forward pass a batch (used for train, val and test batches). Each step/epoch is logged with metrics loss and accuracy using Tensorboard.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch</strong> (<em>torch.tensor</em>) – Input data as batch</p></li>
+<li><p><strong>batch_idx</strong> (<em>int</em>) – Unused but needed in overloading</p></li>
+<li><p><strong>stage</strong> (<em>str</em><em>, </em><em>optional</em>) – Name of the current stage i.e. train, val or test. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Loss and accuracy as keys</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.PerceptionWindow.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None._VariableFunctionsClass.tensor</span></span></span><a class="reference internal" href="../_modules/training/models.html#PerceptionWindow.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.PerceptionWindow.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Model forward pass. Takes the windowed input data from x, and for each instance in window, the model is inferenced. The batch and window axis are swapped so each model forward pass is over the batch of element <em>i</em> in the window.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>torch.tensor</em>) – Model input</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Model output</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.PerceptionWindow.test_step">
+<span class="sig-name descname"><span class="pre">test_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/training/models.html#PerceptionWindow.test_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.PerceptionWindow.test_step" title="Permalink to this definition"></a></dt>
+<dd><p>On test step, call self.evaluate (forward pass) and return</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch</strong> (<em>torch.tensor</em>) – Input data as batch</p></li>
+<li><p><strong>batch_idx</strong> (<em>int</em>) – Unused but needed in overloading</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output from self.evaluate</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.PerceptionWindow.training_step">
+<span class="sig-name descname"><span class="pre">training_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/training/models.html#PerceptionWindow.training_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.PerceptionWindow.training_step" title="Permalink to this definition"></a></dt>
+<dd><p>On training step, call self.evaluate (forward pass) and return</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch</strong> (<em>torch.tensor</em>) – Input data as batch</p></li>
+<li><p><strong>batch_idx</strong> (<em>int</em>) – Unused but needed in overloading</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output from self.evaluate</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.PerceptionWindow.validation_step">
+<span class="sig-name descname"><span class="pre">validation_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/training/models.html#PerceptionWindow.validation_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.PerceptionWindow.validation_step" title="Permalink to this definition"></a></dt>
+<dd><p>On validation step, call self.evaluate (forward pass) and return</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch</strong> (<em>torch.tensor</em>) – Input data as batch</p></li>
+<li><p><strong>batch_idx</strong> (<em>int</em>) – Unused but needed in overloading</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output from self.evaluate</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="neuroplytorch">
+<h3>Neuroplytorch<a class="headerlink" href="#neuroplytorch" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="training.models.Neuroplytorch">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">training.models.</span></span><span class="sig-name descname"><span class="pre">Neuroplytorch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reasoning_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="basic_models.html#training.basic_models.BasicLSTM" title="training.basic_models.BasicLSTM"><span class="pre">training.basic_models.BasicLSTM</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">perception_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#training.models.PerceptionWindow" title="training.models.PerceptionWindow"><span class="pre">training.models.PerceptionWindow</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_primitive_events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/training/models.html#Neuroplytorch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.Neuroplytorch" title="Permalink to this definition"></a></dt>
+<dd><p>Neuroplytorch model for end-to-end training. Takes the trained reasoning model of type class:<cite>training.basic_models.BasicLSTM</cite> and a perception model that inherits from torch.nn.Module to create the end-to-end model for inferencing from raw input data to complex event labels.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.Neuroplytorch.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reasoning_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="basic_models.html#training.basic_models.BasicLSTM" title="training.basic_models.BasicLSTM"><span class="pre">training.basic_models.BasicLSTM</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">perception_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#training.models.PerceptionWindow" title="training.models.PerceptionWindow"><span class="pre">training.models.PerceptionWindow</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_primitive_events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/training/models.html#Neuroplytorch.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.Neuroplytorch.__init__" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reasoning_model</strong> (class:<cite>training.basic_models.BasicLSTM</cite>) – </p></li>
+<li><p><strong>perception_model</strong> – The perception model to use on the windowed data</p></li>
+<li><p><strong>window_size</strong> (<em>int</em>) – Size of the window of primitive events.</p></li>
+<li><p><strong>num_primitive_events</strong> (<em>int</em>) – Number of primitive events i.e. size of one hot primitive event vectors.</p></li>
+<li><p><strong>loss_str</strong> (<em>str</em>) – Loss function name to use for training.</p></li>
+<li><p><strong>lr</strong> (<em>float</em>) – Learning rate for optimizer.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.Neuroplytorch.calculate_accuracy">
+<span class="sig-name descname"><span class="pre">calculate_accuracy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yPred</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yTrue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None._VariableFunctionsClass.tensor</span></span></span><a class="reference internal" href="../_modules/training/models.html#Neuroplytorch.calculate_accuracy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.Neuroplytorch.calculate_accuracy" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate accuracy of forward pass. Neuroplytorch model accuracy for a single instance is either 1.0 or 0.0, and must have both vectors match perfectly to be correct, otherwise is 0.0, regardless of whether some elements of each vector match.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>yPred</strong> (<em>torch.tensor</em>) – Output of model</p></li>
+<li><p><strong>yTrue</strong> (<em>torch.tensor</em>) – Ground truth label</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Mean accuracy of yPred with yTrue as ground truth</p>
+</dd>
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.Neuroplytorch.calculate_complex_accuracy">
+<span class="sig-name descname"><span class="pre">calculate_complex_accuracy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yPred</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yTrue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None._VariableFunctionsClass.tensor</span></span></span><a class="reference internal" href="../_modules/training/models.html#Neuroplytorch.calculate_complex_accuracy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.Neuroplytorch.calculate_complex_accuracy" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate accuracy of forward pass, but only considering instances where either the inference or ground truth are not ‘zero-complex-event windows’, i.e. the accuracy of instances where the prediction or ground truth has at least one complex event. This gives a better representation of model accuracy given the usual very large bias towards windows with no complex events occuring.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>yPred</strong> (<em>torch.tensor</em>) – Output of model</p></li>
+<li><p><strong>yTrue</strong> (<em>torch.tensor</em>) – Ground truth label</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Mean accuracy of yPred with yTrue as ground truth</p>
+</dd>
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.Neuroplytorch.calculate_intermediate_accuracy">
+<span class="sig-name descname"><span class="pre">calculate_intermediate_accuracy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yPredIntermediate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yTrueIntermediate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None._VariableFunctionsClass.tensor</span></span></span><a class="reference internal" href="../_modules/training/models.html#Neuroplytorch.calculate_intermediate_accuracy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.Neuroplytorch.calculate_intermediate_accuracy" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate accuracy of the intermediate output in forward pass, i.e. the accuracy of the perception layer relative to the intermediate labels. Output of model and labels are windowed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>yPredIntermediate</strong> (<em>torch.tensor</em>) – Output of model</p></li>
+<li><p><strong>yTrueIntermediate</strong> (<em>torch.tensor</em>) – Ground truth label</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Mean accuracy of yPredIntermediate with yTrueIntermediate as ground truth</p>
+</dd>
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.Neuroplytorch.calculate_loss">
+<span class="sig-name descname"><span class="pre">calculate_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yPred</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yTrue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None._VariableFunctionsClass.tensor</span></span></span><a class="reference internal" href="../_modules/training/models.html#Neuroplytorch.calculate_loss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.Neuroplytorch.calculate_loss" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate loss of model output with respect to ground truth and loss function provided on model initialisation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>yPred</strong> (<em>torch.tensor</em>) – Output of model</p></li>
+<li><p><strong>yTrue</strong> (<em>torch.tensor</em>) – Ground truth label</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Loss of yPred with yTrue as ground truth</p>
+</dd>
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.Neuroplytorch.configure_optimizers">
+<span class="sig-name descname"><span class="pre">configure_optimizers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/training/models.html#Neuroplytorch.configure_optimizers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.Neuroplytorch.configure_optimizers" title="Permalink to this definition"></a></dt>
+<dd><p>Configure the optimizer (Adam) for training using a learning rate provided on model initialisation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Optimizer set to model parameters</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.Neuroplytorch.evaluate">
+<span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/training/models.html#Neuroplytorch.evaluate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.Neuroplytorch.evaluate" title="Permalink to this definition"></a></dt>
+<dd><p>Forward pass a batch (used for train, val and test batches). Each step/epoch is logged with metrics loss, accuracy and inter_accuracy using Tensorboard.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch</strong> (<em>torch.tensor</em>) – Input data as batch</p></li>
+<li><p><strong>batch_idx</strong> (<em>int</em>) – Unused but needed in overloading</p></li>
+<li><p><strong>stage</strong> (<em>str</em><em>, </em><em>optional</em>) – Name of the current stage i.e. train, val or test. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Loss and accuracy as keys</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.Neuroplytorch.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span></span></span><a class="reference internal" href="../_modules/training/models.html#Neuroplytorch.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.Neuroplytorch.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Model forward pass. First passes through the perception layer. which outputs a window of inferences, which is then passed through the reasoning layer to inference the complex event label.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>torch.tensor</em>) – Model input</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Tuple of intermediate_output, reasoning_output</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.Neuroplytorch.test_epoch_end">
+<span class="sig-name descname"><span class="pre">test_epoch_end</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outputs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/training/models.html#Neuroplytorch.test_epoch_end"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.Neuroplytorch.test_epoch_end" title="Permalink to this definition"></a></dt>
+<dd><p>On training epoch end, calculate and log the complex accuracy across the whole epoch.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.Neuroplytorch.test_step">
+<span class="sig-name descname"><span class="pre">test_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/training/models.html#Neuroplytorch.test_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.Neuroplytorch.test_step" title="Permalink to this definition"></a></dt>
+<dd><p>On test step, call self.evaluate (forward pass) and return</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch</strong> (<em>torch.tensor</em>) – Input data as batch</p></li>
+<li><p><strong>batch_idx</strong> (<em>int</em>) – Unused but needed in overloading</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output from self.evaluate</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.Neuroplytorch.training_epoch_end">
+<span class="sig-name descname"><span class="pre">training_epoch_end</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outputs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/training/models.html#Neuroplytorch.training_epoch_end"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.Neuroplytorch.training_epoch_end" title="Permalink to this definition"></a></dt>
+<dd><p>On training epoch end, calculate and log the complex accuracy across the whole epoch. Since the bias towards windows with no complex events occuring is large, some batches may be entirely ‘zero-window’ instances, and so the calculation has to occur at the end of the epoch rather than per-batch.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.Neuroplytorch.training_step">
+<span class="sig-name descname"><span class="pre">training_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/training/models.html#Neuroplytorch.training_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.Neuroplytorch.training_step" title="Permalink to this definition"></a></dt>
+<dd><p>On training step, call self.evaluate (forward pass) and return</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch</strong> (<em>torch.tensor</em>) – Input data as batch</p></li>
+<li><p><strong>batch_idx</strong> (<em>int</em>) – Unused but needed in overloading</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output from self.evaluate</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.Neuroplytorch.validation_epoch_end">
+<span class="sig-name descname"><span class="pre">validation_epoch_end</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outputs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/training/models.html#Neuroplytorch.validation_epoch_end"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.Neuroplytorch.validation_epoch_end" title="Permalink to this definition"></a></dt>
+<dd><p>On validation epoch end, calculate and log the complex accuracy across the whole epoch. Also create a confusion matrix from the validation inferences across the epoch and log.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.Neuroplytorch.validation_step">
+<span class="sig-name descname"><span class="pre">validation_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/training/models.html#Neuroplytorch.validation_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.Neuroplytorch.validation_step" title="Permalink to this definition"></a></dt>
+<dd><p>On validation step, call self.evaluate (forward pass) and return</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch</strong> (<em>torch.tensor</em>) – Input data as batch</p></li>
+<li><p><strong>batch_idx</strong> (<em>int</em>) – Unused but needed in overloading</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output from self.evaluate</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="mnistmodel">
+<h3>MNISTModel<a class="headerlink" href="#mnistmodel" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="training.models.MNISTModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">training.models.</span></span><span class="sig-name descname"><span class="pre">MNISTModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loss_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/training/models.html#MNISTModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.MNISTModel" title="Permalink to this definition"></a></dt>
+<dd><p>Pytorch Lightning Module wrapping the LeNet pure Pytorch model for training with the MNISTDataModule using Pytorch Lightning</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.MNISTModel.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loss_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/training/models.html#MNISTModel.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.MNISTModel.__init__" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>loss_str</strong> (<em>str</em>) – Loss function name to use for training.</p></li>
+<li><p><strong>lr</strong> (<em>float</em>) – Learning rate for optimizer.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.MNISTModel.calculate_accuracy">
+<span class="sig-name descname"><span class="pre">calculate_accuracy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yPred</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yTrue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None._VariableFunctionsClass.tensor</span></span></span><a class="reference internal" href="../_modules/training/models.html#MNISTModel.calculate_accuracy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.MNISTModel.calculate_accuracy" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate accuracy of forward pass.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>yPred</strong> (<em>torch.tensor</em>) – Output of model</p></li>
+<li><p><strong>yTrue</strong> (<em>torch.tensor</em>) – Ground truth label</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Mean accuracy of yPred with yTrue as ground truth</p>
+</dd>
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.MNISTModel.calculate_loss">
+<span class="sig-name descname"><span class="pre">calculate_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yPred</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yTrue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None._VariableFunctionsClass.tensor</span></span></span><a class="reference internal" href="../_modules/training/models.html#MNISTModel.calculate_loss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.MNISTModel.calculate_loss" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate loss of model output with respect to ground truth and loss function provided on model initialisation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>yTrue</strong> (<em>torch.tensor</em>) – Ground truth label</p></li>
+<li><p><strong>yPred</strong> (<em>torch.tensor</em>) – Output of model</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Loss of yPred with yTrue as ground truth</p>
+</dd>
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.MNISTModel.configure_optimizers">
+<span class="sig-name descname"><span class="pre">configure_optimizers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/training/models.html#MNISTModel.configure_optimizers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.MNISTModel.configure_optimizers" title="Permalink to this definition"></a></dt>
+<dd><p>Configure the optimizer (Adam) for training using a learning rate provided on model initialisation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Optimizer set to model parameters</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.MNISTModel.evaluate">
+<span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/training/models.html#MNISTModel.evaluate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.MNISTModel.evaluate" title="Permalink to this definition"></a></dt>
+<dd><p>Forward pass a batch (used for train, val and test batches). Each step/epoch is logged with metrics loss and accuracy using Tensorboard.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch</strong> (<em>torch.tensor</em>) – Input data as batch</p></li>
+<li><p><strong>batch_idx</strong> (<em>int</em>) – Unused but needed in overloading</p></li>
+<li><p><strong>stage</strong> (<em>str</em><em>, </em><em>optional</em>) – Name of the current stage i.e. train, val or test. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Loss and accuracy as keys</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.MNISTModel.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None._VariableFunctionsClass.tensor</span></span></span><a class="reference internal" href="../_modules/training/models.html#MNISTModel.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.MNISTModel.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Model forward pass</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>torch.tensor</em>) – Model input</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Model output</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.MNISTModel.test_step">
+<span class="sig-name descname"><span class="pre">test_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/training/models.html#MNISTModel.test_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.MNISTModel.test_step" title="Permalink to this definition"></a></dt>
+<dd><p>On test step, call self.evaluate (forward pass) and return</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch</strong> (<em>torch.tensor</em>) – Input data as batch</p></li>
+<li><p><strong>batch_idx</strong> (<em>int</em>) – Unused but needed in overloading</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output from self.evaluate</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.MNISTModel.training_step">
+<span class="sig-name descname"><span class="pre">training_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/training/models.html#MNISTModel.training_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.MNISTModel.training_step" title="Permalink to this definition"></a></dt>
+<dd><p>On training step, call self.evaluate (forward pass) and return</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch</strong> (<em>torch.tensor</em>) – Input data as batch</p></li>
+<li><p><strong>batch_idx</strong> (<em>int</em>) – Unused but needed in overloading</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output from self.evaluate</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.MNISTModel.validation_step">
+<span class="sig-name descname"><span class="pre">validation_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/training/models.html#MNISTModel.validation_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.MNISTModel.validation_step" title="Permalink to this definition"></a></dt>
+<dd><p>On validation step, call self.evaluate (forward pass) and return</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch</strong> (<em>torch.tensor</em>) – Input data as batch</p></li>
+<li><p><strong>batch_idx</strong> (<em>int</em>) – Unused but needed in overloading</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output from self.evaluate</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="emnistmodel">
+<h3>EMNISTModel<a class="headerlink" href="#emnistmodel" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="training.models.EMNISTModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">training.models.</span></span><span class="sig-name descname"><span class="pre">EMNISTModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loss_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/training/models.html#EMNISTModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.EMNISTModel" title="Permalink to this definition"></a></dt>
+<dd><p>Pytorch Lightning Module wrapping the LeNet pure Pytorch model for training with the EMNISTDataModule using Pytorch Lightning</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.EMNISTModel.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loss_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/training/models.html#EMNISTModel.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.EMNISTModel.__init__" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>loss_str</strong> (<em>str</em>) – Loss function name to use for training.</p></li>
+<li><p><strong>lr</strong> (<em>float</em>) – Learning rate for optimizer.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.EMNISTModel.calculate_accuracy">
+<span class="sig-name descname"><span class="pre">calculate_accuracy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yPred</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yTrue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None._VariableFunctionsClass.tensor</span></span></span><a class="reference internal" href="../_modules/training/models.html#EMNISTModel.calculate_accuracy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.EMNISTModel.calculate_accuracy" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate accuracy of forward pass.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>yPred</strong> (<em>torch.tensor</em>) – Output of model</p></li>
+<li><p><strong>yTrue</strong> (<em>torch.tensor</em>) – Ground truth label</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Mean accuracy of yPred with yTrue as ground truth</p>
+</dd>
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.EMNISTModel.calculate_loss">
+<span class="sig-name descname"><span class="pre">calculate_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yPred</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yTrue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None._VariableFunctionsClass.tensor</span></span></span><a class="reference internal" href="../_modules/training/models.html#EMNISTModel.calculate_loss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.EMNISTModel.calculate_loss" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate loss of model output with respect to ground truth and loss function provided on model initialisation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>yTrue</strong> (<em>torch.tensor</em>) – Ground truth label</p></li>
+<li><p><strong>yPred</strong> (<em>torch.tensor</em>) – Output of model</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Loss of yPred with yTrue as ground truth</p>
+</dd>
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.EMNISTModel.configure_optimizers">
+<span class="sig-name descname"><span class="pre">configure_optimizers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/training/models.html#EMNISTModel.configure_optimizers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.EMNISTModel.configure_optimizers" title="Permalink to this definition"></a></dt>
+<dd><p>Configure the optimizer (Adam) for training using a learning rate provided on model initialisation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Optimizer set to model parameters</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.EMNISTModel.evaluate">
+<span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/training/models.html#EMNISTModel.evaluate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.EMNISTModel.evaluate" title="Permalink to this definition"></a></dt>
+<dd><p>Forward pass a batch (used for train, val and test batches). Each step/epoch is logged with metrics loss and accuracy using Tensorboard.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch</strong> (<em>torch.tensor</em>) – Input data as batch</p></li>
+<li><p><strong>batch_idx</strong> (<em>int</em>) – Unused but needed in overloading</p></li>
+<li><p><strong>stage</strong> (<em>str</em><em>, </em><em>optional</em>) – Name of the current stage i.e. train, val or test. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Loss and accuracy as keys</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.EMNISTModel.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None._VariableFunctionsClass.tensor</span></span></span><a class="reference internal" href="../_modules/training/models.html#EMNISTModel.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.EMNISTModel.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Model forward pass</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>torch.tensor</em>) – Model input</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Model output</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.EMNISTModel.test_step">
+<span class="sig-name descname"><span class="pre">test_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/training/models.html#EMNISTModel.test_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.EMNISTModel.test_step" title="Permalink to this definition"></a></dt>
+<dd><p>On test step, call self.evaluate (forward pass) and return</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch</strong> (<em>torch.tensor</em>) – Input data as batch</p></li>
+<li><p><strong>batch_idx</strong> (<em>int</em>) – Unused but needed in overloading</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output from self.evaluate</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.EMNISTModel.training_step">
+<span class="sig-name descname"><span class="pre">training_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/training/models.html#EMNISTModel.training_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.EMNISTModel.training_step" title="Permalink to this definition"></a></dt>
+<dd><p>On training step, call self.evaluate (forward pass) and return</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch</strong> (<em>torch.tensor</em>) – Input data as batch</p></li>
+<li><p><strong>batch_idx</strong> (<em>int</em>) – Unused but needed in overloading</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output from self.evaluate</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="training.models.EMNISTModel.validation_step">
+<span class="sig-name descname"><span class="pre">validation_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None._VariableFunctionsClass.tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/training/models.html#EMNISTModel.validation_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.EMNISTModel.validation_step" title="Permalink to this definition"></a></dt>
+<dd><p>On validation step, call self.evaluate (forward pass) and return</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch</strong> (<em>torch.tensor</em>) – Input data as batch</p></li>
+<li><p><strong>batch_idx</strong> (<em>int</em>) – Unused but needed in overloading</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output from self.evaluate</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+<section id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this headline"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="training.models.get_model">
+<span class="sig-prename descclassname"><span class="pre">training.models.</span></span><span class="sig-name descname"><span class="pre">get_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_name_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pytorch_lightning.core.lightning.LightningModule</span></span></span><a class="reference internal" href="../_modules/training/models.html#get_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.get_model" title="Permalink to this definition"></a></dt>
+<dd><p>Get the Pytorch Lightning module associated with the string given, which is defined in the config file
+:param model_name_str: Name of the module to return
+:type model_name_str: str</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The Pytorch Lightning module</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>pytorch_lightning.LightningModule</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="training.models.check_reasoning_logic">
+<span class="sig-prename descclassname"><span class="pre">training.models.</span></span><span class="sig-name descname"><span class="pre">check_reasoning_logic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reasoning_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.nn.modules.module.Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ce_fsm_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ce_time_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_primitive_events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/training/models.html#check_reasoning_logic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training.models.check_reasoning_logic" title="Permalink to this definition"></a></dt>
+<dd><p>Check the logic of the reasoning model through all possible permutations of windowed primitive events to ensure that this layer will correctly label each instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reasoning_model</strong> (<em>nn.Module</em><em> (or </em><em>a class that inherits nn.Module</em><em>, </em><em>e.g. pytorch_lightning.LightningModule</em><em>)</em>) – The reasoning model to check.</p></li>
+<li><p><strong>ce_fsm_list</strong> (<em>list</em>) – Pattern of primitive events for each complex event.</p></li>
+<li><p><strong>ce_time_list</strong> (<em>list</em>) – Temporal metadata pattern for each complex event</p></li>
+<li><p><strong>num_primitive_events</strong> (<em>int</em>) – Number of primitive events i.e. size of one hot primitive event vectors.</p></li>
+<li><p><strong>window_size</strong> (<em>int</em>) – Size of the window of primitive events.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="basic_models.html" class="btn btn-neutral float-left" title="Basic Models module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="datasets.html" class="btn btn-neutral float-right" title="Datasets module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Cai Davies.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
