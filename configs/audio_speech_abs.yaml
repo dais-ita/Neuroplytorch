@@ -8,7 +8,7 @@ TRAINING:
   DATASET:
     NAME: UrbanSound8K
     TYPE: audio_wav
-    LOCATION: datasets/UrbanSound8K_
+    LOCATION: /home/cai/Downloads/datasets/UrbanSound8K
 
   REASONING:
     LOSS_FUNCTION: MSELoss

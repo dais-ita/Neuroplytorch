@@ -71,7 +71,7 @@ if __name__=="__main__":
 
         window_size = training.get('WINDOW_SIZE', 10)
         num_primitive_events = training.get('NUM_PRIMITIVE_EVENTS', 10)
-        input_size = training['PERCEPTION']['INPUT_SIZE']
+        input_size = perception_model_args.pop('input_size', None)
        
 
         # fetch raw input data 
@@ -86,6 +86,7 @@ if __name__=="__main__":
 
         # if pretrain_perception then train the perception model before attaching to Neuroplytorch, else leave untrained
         perception_model = basic_models.get_model(training['PERCEPTION']['MODEL'])(input_size=input_size, output_size=num_primitive_events, **perception_model_args)
+        if input_size==None: perception_model = basic_models.get_model(training['PERCEPTION']['MODEL'])(output_size=num_primitive_events, **perception_model_args)
         if pretrain_perception:
             perception_data = datasets.get_datamodule(training['PERCEPTION']['PRETRAIN']['DATA_MODULE'])(data_dir=training['DATASET']['NAME'], **perception_dataset_args)
             model = models.get_model(training['PERCEPTION']['PRETRAIN']['MODEL_MODULE'])(loss_str=perception_loss_str, lr=pretrain_lr, **perception_model_args)
