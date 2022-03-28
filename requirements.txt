@@ -1,0 +1,7 @@
+python>=3.9.7
+sphinx>=4.4.0
+pytorch>=1.11
+pytorch-lightning>=1.5.10
+scikit_learn>=1.0.2
+matplotlib>=3.5.1
+pandas>=1.4.1

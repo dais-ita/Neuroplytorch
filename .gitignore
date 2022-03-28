@@ -12,3 +12,4 @@ lightning_logs
 datasets
 
 !*.rst
+!requirements.txt

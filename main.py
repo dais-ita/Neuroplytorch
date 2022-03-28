@@ -72,6 +72,9 @@ if __name__=="__main__":
         window_size = training.get('WINDOW_SIZE', 10)
         num_primitive_events = training.get('NUM_PRIMITIVE_EVENTS', 10)
         input_size = perception_model_args.pop('input_size', None)
+
+        use_gpu = int(torch.cuda.is_available())
+
        
 
         # fetch raw input data 
@@ -90,7 +93,7 @@ if __name__=="__main__":
         if pretrain_perception:
             perception_data = datasets.get_datamodule(training['PERCEPTION']['PRETRAIN']['DATA_MODULE'])(data_dir=training['DATASET']['NAME'], **perception_dataset_args)
             model = models.get_model(training['PERCEPTION']['PRETRAIN']['MODEL_MODULE'])(loss_str=perception_loss_str, lr=pretrain_lr, **perception_model_args)
-            trainer = pl.Trainer(max_epochs=pretrain_num_epochs, gpus=1, precision=16) 
+            trainer = pl.Trainer(max_epochs=pretrain_num_epochs, gpus=use_gpu, precision=16) 
             trainer.fit(model, perception_data)
 
             perception_model = model.model
@@ -112,7 +115,7 @@ if __name__=="__main__":
                 window_size=window_size, **reasoning_dataset_args)
 
             model = models.ReasoningModel(input_size=num_primitive_events, output_size=len(ce_fsm_list), loss_str=reasoning_loss_str, lr=reasoning_lr)
-            trainer = pl.Trainer(max_epochs=reasoning_epochs, gpus=1, precision=16)
+            trainer = pl.Trainer(max_epochs=reasoning_epochs, gpus=use_gpu, precision=16)
 
             trainer.fit(model, reasoning_data)
             trainer.test(model, reasoning_data)
@@ -147,7 +150,8 @@ if __name__=="__main__":
                 save_top_k=3,
                 mode="min",
             )
-            trainer = pl.Trainer(max_epochs=end_to_end_epochs, gpus=1, precision=16)
+
+            trainer = pl.Trainer(max_epochs=end_to_end_epochs, gpus=use_gpu, precision=16)
             trainer.fit(end_model, end_data)
 
             end_model.save_model(f'models/neuroplytorch/{reasoning_loss_str}_{MODULE_NAME}')
