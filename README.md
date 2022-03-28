@@ -12,5 +12,3 @@ A video of the demo can be found in demo_outs/demo_video.mp4. The demo can be ru
 </ul>
 
 The dataset for this demo can be downloaded from https://zenodo.org/record/1203745/files/UrbanSound8K.tar.gz - the audio files are split into 8 folds, for this demo we moved the files from folds 9 & 10 into the test folder, the other folds into the train folder. The metadata file is in it's own folder (UrbanSound8K/metadata) when downloaded, so this is moved to the root directory, as described in the documentation (under Adding your own dataset).
-
-TODO: add requirements
