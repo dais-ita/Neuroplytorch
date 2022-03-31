@@ -219,9 +219,9 @@ predicted. (int)</p></li>
 [TODO]: add further information on window size. (int)</p></li>
 <li><p>DATASET: Defines hyperparameters for the raw input dataset:</p>
 <ul>
-<li><p>NAME:</p></li>
-<li><p>TYPE: (TODO: finish this, but basically file format is defined here)</p></li>
-<li><p>LOCATION:</p></li>
+<li><p>NAME: Arbitrary name of the dataset, doesn’t affect the framework in any way if using a parser, but used as a high-level description for the sake of readability. Is used by the framework only in the case of using a Pytorch Dataset (see below), in which case is used to fetch the correct dataset.</p></li>
+<li><p>TYPE: Defines the format of the data, which is used to determine the parser to use. See <a class="reference internal" href="#new-parser"><span class="std std-ref">Creating a new parser</span></a> for further details. ‘Pytorch Dataset’ will tell the framework to use torchvision datasets (e.g. MNIST or EMNIST).</p></li>
+<li><p>LOCATION: the relative or absolute directory location of the dataset to be used, e.g. datasets/MNIST will point to the relative datasets/MNIST directory in the framework whereas /home/name/datasets/MNIST will be an absolute directory.</p></li>
 </ul>
 </li>
 </ul>
@@ -252,19 +252,26 @@ This is also where the perception model architecture is defined.</p>
 <div><ul class="simple">
 <li><p>MODEL - The name of the model architecture to use, as from <a class="reference internal" href="api/basic_models.html#basic-models-module"><span class="std std-ref">Basic Models</span></a>, e.g. LeNet, VGGish etc. (text)</p></li>
 <li><p>INPUT_SIZE - The input_size parameter passed to the perception model. (int)</p></li>
-<li><p>PRETRAIN - This can be entirely omitted in the case of no pretraining, but holds the necessary parameters for pretraining:
--  MODEL_MODULE
--  DATA_MODULE
--  LOSS_FUNCTION
--  LEARNING_RATE
--  PRETRAIN_PERCEPTION
--  PRETRAIN_EPOCHS</p></li>
+<li><p>PRETRAIN - This can be entirely omitted in the case of no pretraining, but holds the necessary parameters for pretraining:</p>
+<ul>
+<li><p>MODEL_MODULE - The PytorchLightningModule name to be used (see <a class="reference internal" href="api/models.html#models-module"><span class="std std-ref">Models</span></a>)</p></li>
+<li><p>DATA_MODULE - The PytorchLightningDataModule name to be used (see <a class="reference internal" href="api/datasets.html#pytorch-lightning-data-modules"><span class="std std-ref">Pytorch Lightning data modules</span></a>)</p></li>
+<li><p>LOSS_FUNCTION - Name of the loss function to use (see source for training.losses.get_loss_fct from <a class="reference internal" href="api/losses.html#losses-module"><span class="std std-ref">losses</span></a>)</p></li>
+<li><p>LEARNING_RATE - The learning rate to use for training.</p></li>
+<li><p>PRETRAIN_PERCEPTION - Boolean whether to pretrain or not.</p></li>
+<li><p>PRETRAIN_EPOCHS - The number of epochs to train the model for.</p></li>
+</ul>
+</li>
 </ul>
 </div></blockquote>
 </section>
 <section id="complex-events">
 <h4>Complex events<a class="headerlink" href="#complex-events" title="Permalink to this headline"></a></h4>
-<p>Here the complex events are defined.</p>
+<p>Here the complex events are defined. This is implemented as a list of complex event names, which are arbitrary descriptions of the complex event, e.g. worrying_siren,
+each of which has defined the perception pattern (PATTERN), the minimum number of simple events that must occur between events in the pattern (EVENTS_BETWEEN), and while
+it has yet to be implemented, the maximum time between events in the pattern (MAX_TIME). The perception pattern defines the pattern of simple events, as a vector, that must occur for
+the complex event to be occuring, with the last simple event in the pattern needing to match the last simple event in the perception window. For the events between and max
+time definitions, these are also vectors that define the number of events and max time between events, and so must be of size N-1 if N is the size of the pattern vector.</p>
 </section>
 </section>
 </section>
@@ -295,11 +302,13 @@ will be able to train end-to-end with this perception architecture, with no othe
 API documentation as a reference, a new parser for a file format that hasn’t yet been covered by this framework can be defined here. The if-else string-to-object statement is defined in
 <a class="reference internal" href="api/datasets.html#methods"><span class="std std-ref">fetch_perception_data_local</span></a>, and so an if-clause should be added here to match a string name to parser method. It is recommended to read
 the above <a class="reference internal" href="#adding-dataset"><span class="std std-ref">Adding your own dataset</span></a> section to get an understanding of how the data is stored, and so how to parse the data.</p>
+<p>(TODO: discuss the data format from the config file section, as of now the only format is audio_wav, more to be implemented)
+The format of the data to be used in defined in the config file (see <a class="reference internal" href="#training-params"><span class="std std-ref">Training</span></a>), and currently the implementation only supports audio_wav for use with the parser functions.</p>
 </section>
 <section id="pretraining-the-perception-layer">
 <span id="pretrain"></span><h2>Pretraining the perception layer<a class="headerlink" href="#pretraining-the-perception-layer" title="Permalink to this headline"></a></h2>
 <p>This section only applies in the case of pretraining the perception layer, which can either be useful for training the perception layer on its own to see the performance of
-the implemented architecture with the chosen dataset, or to train the perception layer before end-to-end training. TODO: expand further.</p>
+the implemented architecture with the chosen dataset, or to train the perception layer before end-to-end training.</p>
 </section>
 <section id="loading-perception-weights">
 <h2>Loading perception weights<a class="headerlink" href="#loading-perception-weights" title="Permalink to this headline"></a></h2>

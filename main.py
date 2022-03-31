@@ -156,9 +156,3 @@ if __name__=="__main__":
 
             end_model.save_model(f'models/neuroplytorch/{reasoning_loss_str}_{MODULE_NAME}')
 
-            
-            
-
-            # TODO: Document kwargs
-            # TODO: SOCIAL MEDIA SCENARIO: https://arxiv.org/pdf/1709.01848.pdf
-

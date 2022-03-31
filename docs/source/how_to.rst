@@ -137,9 +137,9 @@ this key.
       [TODO]: add further information on window size. (int)
    *  DATASET: Defines hyperparameters for the raw input dataset:
 
-      -  NAME: 
-      -  TYPE: (TODO: finish this, but basically file format is defined here)
-      -  LOCATION: 
+      -  NAME: Arbitrary name of the dataset, doesn't affect the framework in any way if using a parser, but used as a high-level description for the sake of readability. Is used by the framework only in the case of using a Pytorch Dataset (see below), in which case is used to fetch the correct dataset.
+      -  TYPE: Defines the format of the data, which is used to determine the parser to use. See :ref:`Creating a new parser <new parser>` for further details. 'Pytorch Dataset' will tell the framework to use torchvision datasets (e.g. MNIST or EMNIST).
+      -  LOCATION: the relative or absolute directory location of the dataset to be used, e.g. datasets/MNIST will point to the relative datasets/MNIST directory in the framework whereas /home/name/datasets/MNIST will be an absolute directory.
    
 Parameters 
 """""""""""
@@ -166,18 +166,22 @@ This is also where the perception model architecture is defined.
    *  MODEL - The name of the model architecture to use, as from :ref:`Basic Models <api/basic_models:Basic Models module>`, e.g. LeNet, VGGish etc. (text)
    *  INPUT_SIZE - The input_size parameter passed to the perception model. (int)
    *  PRETRAIN - This can be entirely omitted in the case of no pretraining, but holds the necessary parameters for pretraining:
-      -  MODEL_MODULE 
-      -  DATA_MODULE 
-      -  LOSS_FUNCTION
-      -  LEARNING_RATE
-      -  PRETRAIN_PERCEPTION
-      -  PRETRAIN_EPOCHS
+
+      -  MODEL_MODULE - The PytorchLightningModule name to be used (see :ref:`Models <api/models:Models module>`)
+      -  DATA_MODULE - The PytorchLightningDataModule name to be used (see :ref:`Pytorch Lightning data modules <api/datasets:Pytorch Lightning data modules>`)
+      -  LOSS_FUNCTION - Name of the loss function to use (see source for training.losses.get_loss_fct from :ref:`losses <api/losses:Losses module>`)
+      -  LEARNING_RATE - The learning rate to use for training.
+      -  PRETRAIN_PERCEPTION - Boolean whether to pretrain or not.
+      -  PRETRAIN_EPOCHS - The number of epochs to train the model for.
 
 Complex events
 """"""""""""""
 
-Here the complex events are defined. 
-
+Here the complex events are defined. This is implemented as a list of complex event names, which are arbitrary descriptions of the complex event, e.g. worrying_siren,
+each of which has defined the perception pattern (PATTERN), the minimum number of simple events that must occur between events in the pattern (EVENTS_BETWEEN), and while 
+it has yet to be implemented, the maximum time between events in the pattern (MAX_TIME). The perception pattern defines the pattern of simple events, as a vector, that must occur for 
+the complex event to be occuring, with the last simple event in the pattern needing to match the last simple event in the perception window. For the events between and max  
+time definitions, these are also vectors that define the number of events and max time between events, and so must be of size N-1 if N is the size of the pattern vector.
 
 
 .. _adding dataset:
@@ -218,13 +222,17 @@ API documentation as a reference, a new parser for a file format that hasn't yet
 :ref:`fetch_perception_data_local <api/datasets:Methods>`, and so an if-clause should be added here to match a string name to parser method. It is recommended to read 
 the above :ref:`Adding your own dataset <adding dataset>` section to get an understanding of how the data is stored, and so how to parse the data.
 
+The format of the data to be used in defined in the config file (see :ref:`training params`), and currently the implementation only supports audio_wav for use with the parser functions. 
+As more parsers are implemented, the number of formats available will be increased (as mentioned in the above if-clause), and should follow a similar standard, i.e. data type, underscore, data format.
+Further examples may be video_mp4, or text_txt etc. for consistency. 
+
 .. _pretrain:
 
 Pretraining the perception layer
 ---------------------------------
 
 This section only applies in the case of pretraining the perception layer, which can either be useful for training the perception layer on its own to see the performance of 
-the implemented architecture with the chosen dataset, or to train the perception layer before end-to-end training. TODO: expand further.
+the implemented architecture with the chosen dataset, or to train the perception layer before end-to-end training. 
 
 
 Loading perception weights 

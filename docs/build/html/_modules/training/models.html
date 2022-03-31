@@ -258,7 +258,7 @@
     <span class="sd">&quot;&quot;&quot; Pytorch Lightning Module wrapping the LeNet pure Pytorch model for training with the EndToEndDataModule or EndToEndNoTestDataModule using Pytorch Lightning. Uses the intermediate label</span>
 <span class="sd">    from the dataset to train the model on windowed data, similar to how the pereception layer is trained in the Neuroplytorch model but excluding the reasoning layer.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="PerceptionWindow.__init__"><a class="viewcode-back" href="../../api/models.html#training.models.PerceptionWindow.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">perception_model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">window_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_primitive_events</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">loss_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">lr</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+<div class="viewcode-block" id="PerceptionWindow.__init__"><a class="viewcode-back" href="../../api/models.html#training.models.PerceptionWindow.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">perception_model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">window_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_primitive_events</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">loss_str</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;MSELoss&#39;</span><span class="p">,</span> <span class="n">lr</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="mf">0.001</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        :param perception_model: The perception model to use on the windowed data</span>
@@ -267,10 +267,10 @@
 <span class="sd">        :type window_size: int</span>
 <span class="sd">        :param num_primitive_events: Number of primitive events i.e. size of one hot primitive event vectors. </span>
 <span class="sd">        :type num_primitive_events: int</span>
-<span class="sd">        :param loss_str: Loss function name to use for training.</span>
-<span class="sd">        :type loss_str: str</span>
-<span class="sd">        :param lr: Learning rate for optimizer. </span>
-<span class="sd">        :type lr: float</span>
+<span class="sd">        :param loss_str: Loss function name to use for training. Defaults to &#39;MSELoss&#39;.</span>
+<span class="sd">        :type loss_str: str, optional</span>
+<span class="sd">        :param lr: Learning rate for optimizer. Defaults to 0.001.</span>
+<span class="sd">        :type lr: float, optional</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span> 
